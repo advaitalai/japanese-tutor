@@ -20,7 +20,8 @@ A voice-first Japanese conversation partner for one learner, Advait (JLPT N5, To
 
 ## Design
 
-- Stitch is connected through `.mcp.json`. Final screens are designed there before they're built.
+- Screens are designed as a clickable HTML mockup in `design/mockup.html`, published as a private claude.ai page. Change it before building a screen.
+- Stitch is still in `.mcp.json`. It works from a local Claude Code session, but not from cloud sessions: the network proxy cuts calls after about 30 seconds, and generating a screen takes longer.
 - Screens and states are listed in the Screens section of `docs/spec.md`.
 
 ## Writing style
