@@ -41,3 +41,7 @@ Why v0 looks the way it does. Each line is a decision Advait made while testing 
 ## Platform
 
 - **PWA.** Android phone plus MacBook, one codebase, no app store. Artifacts inside Claude were fine for prototypes but can't use the mic, run background grading, or keep data across versions.
+
+## Process
+
+- **The playbook is guidance, not law.** It comes from a different app (a WhatsApp bot). Follow it by default, adapt it where Yui differs, and update it as we learn.

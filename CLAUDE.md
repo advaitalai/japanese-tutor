@@ -8,7 +8,7 @@ A voice-first Japanese conversation partner for one learner, Advait (JLPT N5, To
 - `docs/decisions.md`: why things are the way they are. Check it before proposing something that was already tried and cut.
 - `docs/prompts.md`: Yui's conversation prompt and the grading prompt from the v0.9 prototype, plus the rules the prototype enforced in code.
 - `docs/problem-statement.md`: the original problem framing. Where it disagrees with the spec, the spec wins.
-- `docs/playbook.md`: setup and QA conventions carried over from the date planner project.
+- `docs/playbook.md`: setup, QA and deploy lessons from the date planner project. Strong guidelines, not hard rules.
 
 ## How to work here
 
