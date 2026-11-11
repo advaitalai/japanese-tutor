@@ -46,7 +46,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-off
 .screen{flex:1;min-height:0;display:flex;flex-direction:column}
 
 /* Furigana and romaji */
-.jp{font-family:var(--jp)}
+.jp{font-family:var(--jp);word-break:auto-phrase}
 ruby{ruby-position:over}
 rt{font-size:.48em;color:var(--muted);font-weight:400;letter-spacing:.02em}
 .romaji{color:var(--muted);font-family:var(--ui);font-size:14px}
@@ -61,7 +61,7 @@ rt{font-size:.48em;color:var(--muted);font-weight:400;letter-spacing:.02em}
 .avatar .kana{font-family:var(--jp);font-weight:700;color:#3a2016;font-size:26px;opacity:.75}
 .face .name{font-size:13px;color:var(--muted);letter-spacing:.06em}
 .face .status{font-size:12px;color:var(--faint);min-height:18px}
-[data-state="talking"] .avatar::after{animation:pulse 1.6s ease-out infinite}
+[data-state="talking"] .avatar::after,[data-state="first"] .avatar::after,[data-state="welcome"] .avatar::after{animation:pulse 1.6s ease-out infinite}
 [data-state="thinking"] .avatar{filter:saturate(.7)}
 @keyframes pulse{0%{opacity:.7;transform:scale(.94)}100%{opacity:0;transform:scale(1.12)}}
 
@@ -87,6 +87,7 @@ rt{font-size:.48em;color:var(--muted);font-weight:400;letter-spacing:.02em}
 .thinking i{width:8px;height:8px;border-radius:50%;background:var(--muted);animation:dot 1.2s infinite ease-in-out}
 .thinking i:nth-child(2){animation-delay:.15s}.thinking i:nth-child(3){animation-delay:.3s}
 @keyframes dot{0%,80%,100%{opacity:.25}40%{opacity:1}}
+.summary{font-size:15px;color:var(--fg);font-variant-numeric:tabular-nums}
 .done{font-size:13px;color:var(--muted);text-align:center;border-top:1px solid var(--line);padding-top:12px;margin-top:4px}
 
 /* Sidebar mode */
@@ -111,7 +112,7 @@ rt{font-size:.48em;color:var(--muted);font-weight:400;letter-spacing:.02em}
 .mic{width:76px;height:76px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;box-shadow:0 6px 24px rgba(240,168,126,.25);transition:transform .15s,opacity .15s}
 .mic:active{transform:scale(.96)}
 .mic svg{width:30px;height:30px}
-[data-state="talking"] .mic,[data-state="thinking"] .mic{background:var(--surface-2);color:var(--fg);box-shadow:none}
+[data-state="talking"] .mic,[data-state="thinking"] .mic,[data-state="first"] .mic,[data-state="welcome"] .mic{background:var(--surface-2);color:var(--fg);box-shadow:none}
 [data-state="listening"] .mic{background:#f3ebe3;color:var(--app);box-shadow:0 0 0 10px rgba(243,235,227,.08),0 0 0 22px rgba(243,235,227,.04)}
 .hint{font-size:12px;color:var(--faint);min-height:18px}
 .wave{display:flex;gap:3px;align-items:center;justify-content:center;height:40px}
@@ -190,6 +191,7 @@ rt{font-size:.48em;color:var(--muted);font-weight:400;letter-spacing:.02em}
 // ---------- Data, in the same segment format Yui returns ----------
 // A seg is [text] or [text, reading]. Kanji pieces carry their reading.
 const L = {
+  hello:{seg:[["はじめまして！ユイです。"],["今日","きょう"],["はどうでしたか？"]],romaji:"Hajimemashite! Yui desu. Kyou wa dou deshita ka?"},
   greet:{seg:[["おかえりなさい！"],["週末","しゅうまつ"],["は"],["何","なに"],["をしましたか？"]],romaji:"Okaeri nasai! Shuumatsu wa nani o shimashita ka?"},
   ask:{seg:[["いいですね！"],["何","なん"],["の"],["映画","えいが"],["を"],["見","み"],["ましたか？"]],romaji:"Ii desu ne! Nan no eiga o mimashita ka?"},
   again:{seg:[["じゃあ、"],["何","なん"],["の"],["映画","えいが"],["を"],["見","み"],["ましたか？"]],romaji:"Jaa, nan no eiga o mimashita ka?"},
@@ -246,17 +248,21 @@ function threadHTML(lines){
 
 // ---------- Screens ----------
 const STATES = [
-  ["talking","Yui talking + fix"],["turn","Your turn"],["listening","Listening"],
+  ["first","First open"],["welcome","Welcome back"],["talking","Yui talking + fix"],["turn","Your turn"],["listening","Listening"],
   ["thinking","Thinking"],["sidebar","Sidebar"],["done","Session done"]
 ];
 let screen = "conversation", state = "talking", youEmpty = false, timer;
 
 function conversation(){
   const s = state;
-  const status = {talking:"Speaking",turn:"",listening:"",thinking:"",sidebar:"Explaining in English",done:""}[s];
-  const hint = {talking:"Tap to interrupt",turn:"Tap to talk",listening:"Listening. Tap when you're done",thinking:"",sidebar:"Tap to ask more, or answer her",done:"Tap to talk"}[s];
+  const status = {first:"Speaking",welcome:"Speaking",talking:"Speaking",turn:"",listening:"",thinking:"",sidebar:"Explaining in English",done:""}[s];
+  const hint = {first:"Tap to interrupt",welcome:"Tap to interrupt",talking:"Tap to interrupt",turn:"Tap to talk",listening:"Listening. Tap when you're done",thinking:"",sidebar:"Tap to ask more, or answer her",done:"Tap to talk"}[s];
   let mid = "";
-  if(s==="sidebar"){
+  if(s==="first"){
+    mid = `<div class="yui" style="margin-top:auto;margin-bottom:auto">${jp(L.hello)}</div>`;
+  } else if(s==="welcome"){
+    mid = `<div class="divider">Today</div><div class="yui" style="margin-bottom:auto">${jp(L.greet)}</div>`;
+  } else if(s==="sidebar"){
     mid = `
       <div class="pinned"><div class="head">Yui's question</div>${jp(L.ask)}</div>
       <div class="fix"><div class="head">Recent fix</div>${fixRow(F.miru)}</div>
@@ -268,7 +274,7 @@ function conversation(){
     mid = `
       <div class="mine"><div class="label">You</div><div class="jp">またね！</div><div class="romaji">Mata ne!</div></div>
       <div class="yui">${jp(L.bye)}</div>
-      <div class="done">Session done · 12 min · 3 fixes. Say anything to start a new one.</div>`;
+      <div class="done">Session done · 12 min · 3 fixes</div>`;
   } else {
     const mine = s==="thinking"
       ? `<div class="mine"><div class="label">You</div><div class="jp">トトロを見ました。</div><div class="romaji">Totoro o mimashita.</div></div>`
@@ -331,7 +337,8 @@ function you(){
     </div></div>`, "conversation", "Yui");
 }
 function session(){
-  return sub("Today · 12 min", `
+  return sub("Today", `
+    <div class="summary">12 min · 3 fixes</div>
     <div class="section"><h2>Fixes</h2><div class="fix">${[F.miru,F.ni,F.kat].map(fixRow).join("")}</div></div>
     <div class="section"><h2>You asked about</h2><div class="list"><div class="item"><div class="main"><b class="jp"><ruby>何<rt>なん</rt></ruby>の</b><span>what kind of, which</span></div></div></div></div>
     <div class="section"><h2>Transcript</h2></div>${threadHTML(today)}`, "you", "You");
@@ -360,7 +367,7 @@ document.addEventListener("click",e=>{
   if(b.dataset.empty){ youEmpty=b.dataset.empty==="1"; return render(); }
   if(b.id==="mic"){
     clearTimeout(timer);
-    state = {talking:"turn",turn:"listening",listening:"thinking",sidebar:"listening",done:"listening",thinking:"thinking"}[state];
+    state = {first:"turn",welcome:"turn",talking:"turn",turn:"listening",listening:"thinking",sidebar:"listening",done:"listening",thinking:"thinking"}[state];
     if(state==="thinking") timer=setTimeout(()=>{state="talking";render();},1400);
     render();
   }

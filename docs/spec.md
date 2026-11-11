@@ -26,8 +26,8 @@ In:
 - Captions: Japanese with kanji, furigana over every kanji word, romaji underneath. Always on.
 - Sidebar help in English, as deep as he likes, with Yui's question kept waiting.
 - A correction on screen for every mistake in chat mode, logged for scoring.
-- One continuous thread split into sessions; goodbye closes a session.
-- A one-line session wrap-up.
+- One continuous thread split into sessions. A goodbye, or a gap of 30 minutes or more, starts a new session.
+- One summary line per session, "12 min · 3 fixes". The same line shows at the end of a chat, in the session list and on session detail.
 - Profile: talk minutes, a 14-day chart, the level score with its breakdown, and sessions with transcripts.
 - Memory: facts he gives, and topics from chats.
 
@@ -74,8 +74,15 @@ Memory:
 
 Thread and sessions:
 
-- One running conversation with Yui, like a messaging thread. Opening the app continues it; she greets him back knowing how long it's been and what they last talked about.
-- A session ends on goodbye, or after about 30 minutes of inactivity. Ending triggers grading in the background.
+- One running conversation with Yui, like a messaging thread, stored on the server. Every turn has a server timestamp.
+- The app never needs to know that he closed it. A PWA can be killed, minimized or opened on another device without warning, so sessions are decided by time gaps instead.
+- Each time the app opens or comes back on screen, it loads the thread from the server and checks the last turn:
+  - Less than 30 minutes ago: same session. The screen shows her last line and it's his turn. She doesn't repeat herself (he can say もういちど).
+  - 30 minutes or more: a new session starts. The previous session is graded in the background if it wasn't already. Yui speaks first and greets him back, knowing how long it's been and what they last talked about.
+  - No turns yet (first open): after the mic permission prompt, Yui speaks first with a one-line hello and an easy question.
+- Goodbye ends the session right away and grades it. The next thing he says starts a new session.
+- Minutes and fixes are counted in code as he talks, so the summary line never waits for grading. Only the level waits: it updates after goodbye, or the next time he opens the app.
+- 30 minutes is one config value.
 - Leaving for the profile pauses her voice; the conversation is untouched. The mic stops listening while he's away.
 
 ## Screens
@@ -84,10 +91,10 @@ There are two screens and two sub-views. Opening the app lands on Yui; the only 
 
 | Screen | What it shows | States |
 | --- | --- | --- |
-| Conversation (landing) | Yui's face area, her current line as captions, his last line, a Transcript button, a You button | Yui talking; his turn; listening; thinking; sidebar (waiting question pinned); fix card above her reply; session done line |
+| Conversation (landing) | Yui's face area, her current line as captions, his last line, a Transcript button, a You button | First open (Yui says hello); welcome back (new session, Yui speaks first); Yui talking; his turn; listening; thinking; sidebar (waiting question pinned); fix card above her reply; session done line ("Session done · 12 min · 3 fixes") |
 | Transcript | The whole thread, with a date divider per session, fixes inline | Scrolled to the latest line |
-| Profile (You) | Minutes this week and today, streak; a 14-day bar chart; level score with breakdown; session list | Empty before the first session; level empty until the first graded session |
-| Session detail | Fixes, words he asked about, full transcript of that session | Unfinished sessions marked |
+| Profile (You) | Minutes this week and today, streak; a 14-day bar chart; level score with breakdown; session list (date, summary line, topic) | Empty before the first session; level empty until the first graded session |
+| Session detail | Summary line, fixes, words he asked about, full transcript of that session | None |
 
 Edge states (no mic permission, offline, Yui fails to reply, very long silence) get a design pass after v0.
 
@@ -118,7 +125,7 @@ Everything below belongs to one learner. Names are suggestions for the build.
 
 | Entity | Key fields | Notes |
 | --- | --- | --- |
-| Session | id, started_at, last_activity_at, active_seconds, status (open, done), topic, graded_at | Active time counts gaps between turns, capped at 90 seconds each |
+| Session | id, started_at, last_activity_at, active_seconds, ended_by (goodbye, gap), topic, graded_at | Active time counts gaps between turns, capped at 90 seconds each |
 | Turn | session_id, at, speaker (learner, yui), mode (chat, sidebar, end), text segments with readings, romaji, English parts, audio_ref | Yui's Japanese is stored as segments, each with an optional reading for furigana |
 | Fix | turn_id, wrong, right (segments), reason, at | Chat mode only |
 | Asked item | word or kanji, session_id, at | From sidebar questions |
@@ -138,7 +145,7 @@ Decided:
 - **Structured replies:** Yui returns JSON: mode, parts, fixes, asked items, whether his message was a Japanese attempt. The app, not the model, decides goodbyes, routes "how do I say" to the sidebar, blocks corrections in sidebars, filters false fixes, and counts accuracy.
 - **Prompts live on the server** as a system prompt, with learner state injected each turn (level, known items, recent fixes, asked items, targets, facts, topics). Messages from him can't change her rules.
 - **Japanese text:** readings for furigana and word splitting come from a Japanese tokenizer such as Sudachi or MeCab, not from the model. The prototype used model readings and occasionally got one wrong.
-- **Grading job:** runs server-side when a session closes (goodbye or inactivity). It updates item evidence, the session grade, topics and next targets.
+- **Grading job:** runs server-side when a session ends: right after goodbye, or when the app next opens after a gap of 30 minutes or more. No timers or background schedulers. It updates item evidence, the session grade, topics and next targets.
 - **Model choice:** a fast model for conversation turns, a stronger one for grading.
 
 To decide in Claude Code:
@@ -191,5 +198,6 @@ Ordered roughly by when it's likely to matter.
 
 - Native app later? Only if something specific needs it, such as the animated face or lock-screen audio.
 - Speech-to-text and text-to-speech providers: which handle a learner's accented, halting Japanese best, and which Japanese voice feels most natural?
-- How long a gap closes a session automatically: 30 minutes is the starting guess.
+- How long a gap starts a new session: 30 minutes is the starting guess.
+- Can Yui speak first when the app opens? Chrome allows sound in an installed app, but this needs testing on his phone and Mac early in the build. If blocked, her line shows and she speaks on his first tap.
 - Does a face earn its cost, and when do we test it?
