@@ -312,8 +312,7 @@ function you(){
     <div class="stats"><div class="stat"><b>0</b><span>min today</span></div><div class="stat"><b>0</b><span>min this week</span></div><div class="stat"><b>0</b><span>day streak</span></div></div>
     <div class="section"><h2>Last 14 days</h2><div class="empty">Your talk minutes show up here after your first chat with Yui.</div></div>
     <div class="section"><h2>Level</h2><div class="empty">Your level shows after your first session.</div></div>
-    <div class="section"><h2>Sessions</h2><div class="empty">No sessions yet.</div></div>
-    <div class="list"><button class="item" data-go="knows"><div class="main"><b>What Yui knows</b><span>Facts you've told her</span></div><span class="go">›</span></button></div>`);
+    <div class="section"><h2>Sessions</h2><div class="empty">No sessions yet.</div></div>`);
   return sub("You", `
     <div class="stats"><div class="stat"><b>12</b><span>min today</span></div><div class="stat"><b>65</b><span>min this week</span></div><div class="stat"><b>5</b><span>day streak</span></div></div>
     <div class="section"><h2>Last 14 days</h2><div class="chart">${chart()}</div></div>
@@ -328,9 +327,8 @@ function you(){
       <button class="item" data-go="session"><div class="main"><b>Today</b><span>12 min · 3 fixes · a movie you watched</span></div><span class="go">›</span></button>
       <button class="item" data-go="session"><div class="main"><b>Yesterday</b><span>9 min · no fixes · Yui's bakery</span></div><span class="go">›</span></button>
       <button class="item" data-go="session"><div class="main"><b>Sun, Nov 8</b><span>13 min · 2 fixes · weekend plans</span></div><span class="go">›</span></button>
-      <button class="item" data-go="session"><div class="main"><b>Sat, Nov 7</b><span>6 min · 1 fix · work</span></div><span class="tag">Unfinished</span><span class="go">›</span></button>
-    </div></div>
-    <div class="list"><button class="item" data-go="knows"><div class="main"><b>What Yui knows</b><span>4 facts · 6 topics</span></div><span class="go">›</span></button></div>`, "conversation", "Yui");
+      <button class="item" data-go="session"><div class="main"><b>Sat, Nov 7</b><span>6 min · 1 fix · work</span></div><span class="go">›</span></button>
+    </div></div>`, "conversation", "Yui");
 }
 function session(){
   return sub("Today · 12 min", `
@@ -338,23 +336,13 @@ function session(){
     <div class="section"><h2>You asked about</h2><div class="list"><div class="item"><div class="main"><b class="jp"><ruby>何<rt>なん</rt></ruby>の</b><span>what kind of, which</span></div></div></div></div>
     <div class="section"><h2>Transcript</h2></div>${threadHTML(today)}`, "you", "You");
 }
-function knows(){
-  const facts=["Has lived in Tokyo since June 2025","Works in English all day","Passed JLPT N5","Wants to work in Japanese one day"];
-  const topics=["A movie he watched","The cinema","Yui's bakery","Bread","Weekend plans","Work"];
-  const row=(t,a)=>`<div class="item"><div class="main"><b>${t}</b></div><button class="del" aria-label="${a} ${t}">Delete</button></div>`;
-  return sub("What Yui knows", `
-    <div class="section"><h2>Facts you told her</h2><div class="list">${facts.map(f=>row(f,"Delete")).join("")}</div>
-    <form class="add" onsubmit="event.preventDefault()"><input id="newfact" placeholder="Add a fact" aria-label="Add a fact"><button type="submit">Add</button></form></div>
-    <div class="section"><h2>Topics from your chats</h2><p class="small">Saved as topics, not claims. She asks about them, she doesn't assume.</p><div class="list">${topics.map(f=>row(f,"Delete")).join("")}</div></div>
-    <p class="small">She also tracks the words and grammar you use, your fixes and what you ask about. That feeds your level.</p>`, "you", "You");
-}
 
 // ---------- Render ----------
-const SCREENS=[["conversation","Conversation"],["transcript","Transcript"],["you","You"],["session","Session detail"],["knows","What Yui knows"]];
+const SCREENS=[["conversation","Conversation"],["transcript","Transcript"],["you","You"],["session","Session detail"]];
 const phone=document.getElementById("phone");
 function render(){
   phone.dataset.state = screen==="conversation" ? state : "";
-  phone.innerHTML = {conversation,transcript,you,session,knows}[screen]();
+  phone.innerHTML = {conversation,transcript,you,session}[screen]();
   document.getElementById("screens").innerHTML = SCREENS.map(([k,l])=>`<button class="chip" data-go="${k}" aria-pressed="${k===screen}">${l}</button>`).join("");
   const st = document.getElementById("states");
   if(screen==="conversation") st.innerHTML = STATES.map(([k,l])=>`<button class="chip" data-state="${k}" aria-pressed="${k===state}">${l}</button>`).join("");

@@ -28,7 +28,7 @@ In:
 - A correction on screen for every mistake in chat mode, logged for scoring.
 - One continuous thread split into sessions; goodbye closes a session.
 - A one-line session wrap-up.
-- Profile: talk minutes, a 14-day chart, the level score with its breakdown, sessions with transcripts, and what Yui knows.
+- Profile: talk minutes, a 14-day chart, the level score with its breakdown, and sessions with transcripts.
 - Memory: facts he gives, and topics from chats.
 
 Out of v0 (see Backlog): an animated face, a home screen, onboarding or instruction screens and tips, a separate coach voice, buttons for replay, slower or English, a Stuck button, voice settings, end-of-session synopsis, an activity grid, a captions toggle, scenario or lesson flows.
@@ -69,7 +69,7 @@ Fixes:
 
 Memory:
 
-- Facts: only what he enters or confirms. Topics: what he talked about, stored as topics, never as claims.
+- Facts: a short fixed list set up once (lives in Tokyo, works in English, JLPT N5). Topics: what he talked about, stored as topics, never as claims.
 - She follows up by asking ("did you go for Indian food?"), never asserting.
 - Saying "just practice" keeps a made-up answer out of memory.
 
@@ -81,15 +81,14 @@ Thread and sessions:
 
 ## Screens
 
-There are two screens and three sub-views. Opening the app lands on Yui; the only prompt is the microphone permission on first use.
+There are two screens and two sub-views. Opening the app lands on Yui; the only prompt is the microphone permission on first use.
 
 | Screen | What it shows | States |
 | --- | --- | --- |
 | Conversation (landing) | Yui's face area, her current line as captions, his last line, a Transcript button, a You button | Yui talking; his turn; listening; thinking; sidebar (waiting question pinned); fix card above her reply; session done line |
 | Transcript | The whole thread, with a date divider per session, fixes inline | Scrolled to the latest line |
-| Profile (You) | Minutes this week and today, streak; a 14-day bar chart; level score with breakdown; session list; link to What Yui knows | Empty before the first session; level empty until the first graded session |
+| Profile (You) | Minutes this week and today, streak; a 14-day bar chart; level score with breakdown; session list | Empty before the first session; level empty until the first graded session |
 | Session detail | Fixes, words he asked about, full transcript of that session | Unfinished sessions marked |
-| What Yui knows | Facts (add, delete), topics (delete), a line on what else she tracks | Empty topics before first session |
 
 Edge states (no mic permission, offline, Yui fails to reply, very long silence) get a design pass after v0.
 
@@ -126,7 +125,7 @@ Everything below belongs to one learner. Names are suggestions for the build.
 | Asked item | word or kanji, session_id, at | From sidebar questions |
 | Item evidence | item (word or grammar pattern), kind, correct_days[], wrong_count | Drives the mastery rule |
 | Session grade | session_id, accuracy, understanding, japanese_attempts, fixes_count, asked_count | One per graded session |
-| Memory | facts[] (from him), topics[] (from chats) | Both editable from What Yui knows |
+| Memory | facts[] (from him), topics[] (from chats) | Not shown or editable in v0. Memory controls are backlog |
 | Learner state | level band, target words for next session | Recomputed after each session |
 
 ## Technical decisions
@@ -175,6 +174,7 @@ Ordered roughly by when it's likely to matter.
 | Automatic end-of-turn detection | Conversation | Remove the second tap |
 | Inline assist mid-sentence ("how do I say coconut?") | Conversation | Fill a missing word without leaving the chat |
 | Session synopsis: what went well, one gap, next time | Wrap-up | Only once the next sessions actually act on it |
+| Memory controls: see, add and delete facts and topics | Memory | Fix something Yui remembered wrong, or tell her a new fact |
 | Progress over time: level, vocabulary, grammar, kanji | Profile | Progress is motivating |
 | Fading furigana on kanji he can read | Captions | Builds kanji reading |
 | Captions toggle | Captions | Hide romaji or captions as he improves |

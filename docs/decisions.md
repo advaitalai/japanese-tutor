@@ -46,3 +46,4 @@ Why v0 looks the way it does. Each line is a decision Advait made while testing 
 
 - **The playbook is guidance, not law.** It comes from a different app (a WhatsApp bot). Follow it by default, adapt it where Yui differs, and update it as we learn.
 - **Screens are designed as an HTML mockup, not in Stitch.** Stitch can't generate screens from cloud sessions (calls are cut after 30 seconds). The mockup renders real furigana and fonts, is clickable on his phone, and its layout carries straight into the PWA.
+- **No "What Yui knows" screen in v0.** Cut to keep v0 small. Memory still works underneath (fixed facts, topics from chats, "just practice"). Seeing and editing it is backlog.
