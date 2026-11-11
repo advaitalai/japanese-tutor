@@ -22,12 +22,12 @@ v0 proves one thing: he comes back to talk to Yui most days, and her Japanese st
 
 In:
 
-- Voice conversation with Yui: tap to talk, tap when done, tap while she speaks to interrupt. No time limit while he thinks.
+- Voice conversation with Yui: tap to talk, tap when done. The mic is off while she speaks. No time limit while he thinks.
 - Captions: Japanese with kanji, furigana over every kanji word, romaji underneath. Always on.
 - Sidebar help in English, as deep as he likes, with Yui's question kept waiting.
 - A correction on screen for every mistake in chat mode, logged for scoring.
-- One continuous thread split into sessions. A goodbye, or a gap of 30 minutes or more, starts a new session.
-- One summary line per session, "12 min · 3 fixes". The same line shows at the end of a chat, in the session list and on session detail.
+- One continuous thread split into sessions, one session per day. The day rolls over at 4am Tokyo time.
+- One summary line per session, "12 min · +4 words · 3 fixes": minutes first, then progress, then fixes. The same line shows at the end of a chat, in the session list and on session detail.
 - Profile: talk minutes, a 14-day chart, the level score with its breakdown, and sessions with transcripts.
 - Memory: facts he gives, and topics from chats.
 
@@ -41,7 +41,7 @@ Yui has three modes. The app tracks the mode from her structured replies and enf
 | --- | --- | --- | --- | --- |
 | Chat (default) | Session start; any normal reply | Japanese only, at his level | Every mistake, shown on screen | He asks about the language; he says goodbye |
 | Sidebar | He asks what something means, about a kanji, how to use something, how to say something, why, or about a fix, in any language | Short plain English, with Japanese examples as separate spoken parts | None. The sidebar is a safe place for any question | He signals he's done (ok, got it, わかった) or answers her waiting question in Japanese |
-| End | The app detects a goodbye (またね, じゃあね, bye, おやすみ and similar) outside a sidebar | Short warm goodbye | None | Next thing he says starts a new session |
+| End | The app detects a goodbye (またね, じゃあね, bye, おやすみ and similar) outside a sidebar | Short warm goodbye | None | Next thing he says continues today's session |
 
 Chat mode:
 
@@ -75,14 +75,15 @@ Memory:
 Thread and sessions:
 
 - One running conversation with Yui, like a messaging thread, stored on the server. Every turn has a server timestamp.
-- The app never needs to know that he closed it. A PWA can be killed, minimized or opened on another device without warning, so sessions are decided by time gaps instead.
-- Each time the app opens or comes back on screen, it loads the thread from the server and checks the last turn:
-  - Less than 30 minutes ago: same session. The screen shows her last line and it's his turn. She doesn't repeat herself (he can say もういちど).
-  - 30 minutes or more: a new session starts. The previous session is graded in the background if it wasn't already. Yui speaks first and greets him back, knowing how long it's been and what they last talked about.
-  - No turns yet (first open): after the mic permission prompt, Yui speaks first with a one-line hello and an easy question.
-- Goodbye ends the session right away and grades it. The next thing he says starts a new session.
-- Minutes and fixes are counted in code as he talks, so the summary line never waits for grading. Only the level waits: it updates after goodbye, or the next time he opens the app.
-- 30 minutes is one config value.
+- A session is one day: everything he says between 4am and 4am Tokyo time, on any device. This matches the north star (minutes per day), the 14-day chart and the mastery rule (days).
+- The app never needs to know that he closed it. A PWA can be killed, minimized or opened on another device without warning, so nothing depends on a close event.
+- Each time the app opens or comes back on screen, it loads the thread from the server:
+  - Today already has turns: same session. The screen shows the last line and it's his turn. She doesn't repeat herself (he can say もういちど).
+  - First open of a new day: a new session starts. If the previous day wasn't graded, it's graded in the background. Yui speaks first and greets him back, knowing how long it's been and what they last talked about.
+  - No turns at all (first open ever): after the mic permission prompt, Yui speaks first with a one-line hello and an easy question.
+- Goodbye gets her goodbye and grades the day so far. If he comes back later the same day, the session continues and the next goodbye grades it again. Grading is per day, so grading a day twice never double counts.
+- Minutes and fixes are counted in code as he talks and show at once. "+4 words" needs grading, so it appears a few seconds after goodbye, or the next day if he never said goodbye.
+- The 4am rollover is one config value.
 - Leaving for the profile pauses her voice; the conversation is untouched. The mic stops listening while he's away.
 
 ## Screens
@@ -91,7 +92,7 @@ There are two screens and two sub-views. Opening the app lands on Yui; the only 
 
 | Screen | What it shows | States |
 | --- | --- | --- |
-| Conversation (landing) | Yui's face area, her current line as captions, his last line, a Transcript button, a You button | First open (Yui says hello); welcome back (new session, Yui speaks first); Yui talking; his turn; listening; thinking; sidebar (waiting question pinned); fix card above her reply; session done line ("Session done · 12 min · 3 fixes") |
+| Conversation (landing) | Yui's face area, her current line as captions, his last line, a Transcript button, a You button | First open (Yui says hello); welcome back (first chat of the day, Yui speaks first); Yui talking; his turn; listening; thinking; sidebar (waiting question pinned); fix card above her reply; session done line ("Session done · 12 min · +4 words · 3 fixes") |
 | Transcript | The whole thread, with a date divider per session, fixes inline | Scrolled to the latest line |
 | Profile (You) | Minutes this week and today, streak; a 14-day bar chart; level score with breakdown; session list (date, summary line, topic) | Empty before the first session; level empty until the first graded session |
 | Session detail | Summary line, fixes, words he asked about, full transcript of that session | None |
@@ -102,7 +103,9 @@ Edge states (no mic permission, offline, Yui fails to reply, very long silence) 
 
 The score is "N5 · X% of the way to N4", updated after each session. It borrows from spaced-repetition maturity and mastery tracking, so one good session can't move it much.
 
-Mastery rule: a word or grammar pattern counts as mastered after he uses it correctly on 3 different days. A wrong use removes one day. Items with 1 or 2 days show as learning.
+Mastery rule: a word or grammar pattern counts as mastered after he uses it correctly on 3 different days. A wrong use removes one day. A day with both a correct and a wrong use of the item counts as wrong. Items with 1 or 2 days show as learning.
+
+The ideas behind the rule have strong research behind them: practice spread over days (the spacing effect) and producing a word yourself rather than recognizing it (retrieval practice). The number 3 doesn't: it's a rule of thumb and a setting to tune.
 
 The score combines coverage and quality:
 
@@ -131,10 +134,12 @@ What v0 must do, from Advait's side. The sections above say how things work; the
 
 **S1. Talk to Yui by voice.** I tap the mic, speak, tap again, and Yui answers out loud.
 - My speech becomes text and her reply plays in the Japanese voice. *live*
+- It works with normal background noise: a café, a street, a train platform. *live*
+- I always see what it heard, so a mishearing is obvious and I can say it again. *live*
 - There's no time limit while I think before tapping done. *unit*
 - She starts speaking about 1.5 seconds after my tap, most of the time. Measured from logs. *live*
 
-**S2. Interrupt her.** I tap the mic while she's talking, she stops, and I can talk. *live*
+**S2. She finishes, then I talk.** The mic is off while she speaks and comes back when she's done. Interrupting is backlog. *live*
 
 **S3. Read along.** Everything she says in Japanese shows with kanji, furigana over every kanji word, and romaji underneath.
 - Readings and word splits come from the tokenizer, not the model. *unit*
@@ -164,8 +169,8 @@ What v0 must do, from Advait's side. The sections above say how things work; the
 ### Fixes
 
 **S12. Every mistake gets a card.** In chat mode, each mistake shows above her reply: my words struck through, the correct version with furigana, and a reason under 12 words. Several fixes share one card. *P0*
-
-**S13. No fake fixes.** A fix is dropped if its "wrong" text isn't in what I said, or if it equals the correction. Romaji spellings (o/wo, ou/oo) never count. *unit*
+- Fake fixes are dropped: a fix whose "wrong" text isn't in what I said, or that equals the correction. Romaji spellings (o/wo, ou/oo) never count. *unit*
+- No fixes on a turn speech-to-text wasn't confident about. *unit*
 
 **S14. Shown, not spoken.** Fixes are never read aloud. She replies normally, using the correct form. *live*
 
@@ -175,15 +180,15 @@ What v0 must do, from Advait's side. The sections above say how things work; the
 
 **S16. First open.** The only prompt is mic permission. Then Yui says hello in one line and asks an easy question. *live*
 
-**S17. Back within 30 minutes.** Same session. Her last line is on screen and it's my turn. She doesn't repeat herself. *unit, live*
+**S17. Back the same day.** Same session, continued. The last line is on screen and it's my turn. She doesn't repeat herself. *unit, live*
 
-**S18. Back after 30 minutes or more.** A new session starts, the old one gets graded, and she greets me back knowing how long it's been and what we last talked about. *unit, P0*
+**S18. First chat of a new day.** A new session starts, the previous day gets graded if it wasn't, and she greets me back knowing how long it's been and what we last talked about. The day rolls over at 4am. *unit, P0*
 
-**S19. Say goodbye.** またね, じゃあね, bye, おやすみ and similar end the session, even if the model misses it, but never from a sidebar. She says a short goodbye and I see "Session done · 12 min · 3 fixes". The next thing I say starts a new session. *unit, P0*
+**S19. Say goodbye.** またね, じゃあね, bye, おやすみ and similar end the session, even if the model misses it, but never from a sidebar. She says a short goodbye and I see "Session done · 12 min · +4 words · 3 fixes". Minutes and fixes show at once; "+4 words" (words and patterns that moved up today) appears when grading finishes, a few seconds later. If I come back later that day, the session continues. *unit, P0*
 
 **S20. Leave without losing anything.** Minimizing pauses her voice and stops the mic. Closing the app, minimizing or switching devices never loses a turn. *live*
 
-**S21. Either device.** My phone and my Mac show the same thread. The 30-minute rule uses server time. *live*
+**S21. Either device.** My phone and my Mac show the same thread. Days are counted in Tokyo time on the server. *live*
 
 ### Memory
 
@@ -191,14 +196,14 @@ What v0 must do, from Advait's side. The sections above say how things work; the
 
 ### Progression
 
-**S23. Every session gets graded once.** Grading runs right after goodbye, or when I next open the app after a gap. It never grades a session twice, and a failed run is retried on the next open. *unit*
+**S23. Every day gets graded.** Grading runs after each goodbye, and on the first open of a new day if the previous day wasn't graded. Grading a day again gives the same result and never double counts. A failed run is retried on the next open. *unit*
 
-**S24. Mastery takes 3 days.** A word or pattern is mastered after correct use on 3 different days. A wrong use removes a day. 1 or 2 days shows as learning. *unit*
+**S24. Mastery takes 3 days.** A word or pattern is mastered after correct use on 3 different days. A wrong use removes a day. A day with both a correct and a wrong use counts as wrong. 1 or 2 days shows as learning. The 3 is a setting. *unit*
 
 **S25. Level from evidence.** The score follows the formula in Level scoring, so one good session can't move it much. *unit*
 - Accuracy is counted in code: Japanese replies with no fix, divided by all Japanese replies, over the last 5 sessions. *unit*
 
-**S26. Next time is planned.** Grading picks 2 or 3 target words for the next session, and they go into her prompt. *unit*
+**S26. Next time is planned.** Grading picks targets for the next session, and they go into her prompt. Targets can be words, grammar patterns (〜たい, い-adjective past) or skill sets (numbers, counters, days of the month, telling time, prices). *unit*
 
 ### Profile and transcript
 
@@ -218,7 +223,7 @@ What v0 must do, from Advait's side. The sections above say how things work; the
 
 **S33. Claude can debug from logs.** Every turn logs what I said, her reply, the mode, fixes kept and dropped with the reason, and latency. Startup logs the app version. Claude reads logs with a read-only key. *live*
 
-**S34. Test before live.** A test version runs next to the live one, with its own data. Changes go live only when I say "ship it". *live*
+**S34. A deploy never costs me my data or my day.** Tests run before every deploy. The version shows in the logs. A bad deploy can be rolled back in one step. My data is backed up daily. A separate test version is backlog. *unit, live*
 
 ## Data model
 
@@ -226,7 +231,7 @@ Everything below belongs to one learner. Names are suggestions for the build.
 
 | Entity | Key fields | Notes |
 | --- | --- | --- |
-| Session | id, started_at, last_activity_at, active_seconds, ended_by (goodbye, gap), topic, graded_at | Active time counts gaps between turns, capped at 90 seconds each |
+| Session | id, day (4am to 4am, Tokyo time), started_at, last_activity_at, active_seconds, topic, graded_at, items_moved_up | Active time counts gaps between turns, capped at 90 seconds each |
 | Turn | session_id, at, speaker (learner, yui), mode (chat, sidebar, end), text segments with readings, romaji, English parts, audio_ref | Yui's Japanese is stored as segments, each with an optional reading for furigana |
 | Fix | turn_id, wrong, right (segments), reason, at | Chat mode only |
 | Asked item | word or kanji, session_id, at | From sidebar questions |
@@ -241,13 +246,14 @@ Decided:
 
 - **Platform:** a PWA (installable web app) for Chrome on his Android phone and Chrome or Safari on his MacBook, with one codebase and one deploy. Sessions and transcripts live on the server, so the thread continues across devices. No app store.
 - **Voice pipeline:** speech-to-text, then Claude, then text-to-speech, rather than a single speech-to-speech model. This keeps the raw transcript for fixes and grading, and lets captions, furigana and the English voice be controlled separately.
-- **Turn-taking:** tap to talk, tap when done, tap to interrupt. Automatic end-of-turn detection comes later, once it can tell a thinking pause from a finished sentence.
+- **Turn-taking:** tap to talk, tap when done. The mic is off while she speaks; interrupting is backlog. Automatic end-of-turn detection comes later, once it can tell a thinking pause from a finished sentence.
 - **Two voices:** a Japanese voice for every Japanese part and an English voice for sidebar English. Each reply is a list of parts tagged with language.
 - **Structured replies:** Yui returns JSON: mode, parts, fixes, asked items, whether his message was a Japanese attempt. The app, not the model, decides goodbyes, routes "how do I say" to the sidebar, blocks corrections in sidebars, filters false fixes, and counts accuracy.
 - **Prompts live on the server** as a system prompt, with learner state injected each turn (level, known items, recent fixes, asked items, targets, facts, topics). Messages from him can't change her rules.
 - **Japanese text:** readings for furigana and word splitting come from a Japanese tokenizer such as Sudachi or MeCab, not from the model. The prototype used model readings and occasionally got one wrong.
-- **Grading job:** runs server-side when a session ends: right after goodbye, or when the app next opens after a gap of 30 minutes or more. No timers or background schedulers. It updates item evidence, the session grade, topics and next targets.
+- **Grading job:** runs server-side after each goodbye (grading the day so far), and on the first open of a new day if the previous day wasn't graded. No timers or background schedulers. Grading a day again gives the same result. It updates item evidence, the session grade, topics and next targets.
 - **Model choice:** a fast model for conversation turns, a stronger one for grading.
+- **Low-confidence speech:** when speech-to-text isn't confident about what he said, no fixes are made for that turn. A mishearing must not become a fake fix.
 
 To decide in Claude Code:
 
@@ -279,6 +285,7 @@ Ordered roughly by when it's likely to matter.
 | Sidebar questions as a level signal | Scoring | What he asks about (words, grammar, how to say things) shows exactly what he doesn't know yet |
 | Code-based understanding count | Scoring | Exact, instead of a model estimate |
 | Automatic end-of-turn detection | Conversation | Remove the second tap |
+| Interrupt Yui while she speaks | Conversation | Needed once her replies get longer, around N4 |
 | Inline assist mid-sentence ("how do I say coconut?") | Conversation | Fill a missing word without leaving the chat |
 | Session synopsis: what went well, one gap, next time | Wrap-up | Only once the next sessions actually act on it |
 | Memory controls: see, add and delete facts and topics | Memory | Fix something Yui remembered wrong, or tell her a new fact |
@@ -294,11 +301,12 @@ Ordered roughly by when it's likely to matter.
 | Daily nudge written by Yui | Engagement | Brings him back |
 | Animated face for Yui | Conversation | Connection; test voice-only, then 2D, then realistic |
 | Edge state designs | All | No mic, offline, failed replies |
+| Separate test version of the app | Running it | Protects the daily habit once a broken deploy starts costing streaks |
 
 ## Open questions
 
 - Native app later? Only if something specific needs it, such as the animated face or lock-screen audio.
 - Speech-to-text and text-to-speech providers: which handle a learner's accented, halting Japanese best, and which Japanese voice feels most natural?
-- How long a gap starts a new session: 30 minutes is the starting guess.
+- Is 4am the right day rollover? It keeps a late-night chat with that evening's session.
 - Can Yui speak first when the app opens? Chrome allows sound in an installed app, but this needs testing on his phone and Mac early in the build. If blocked, her line shows and she speaks on his first tap.
 - Does a face earn its cost, and when do we test it?

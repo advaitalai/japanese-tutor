@@ -51,5 +51,8 @@ Why v0 looks the way it does. Each line is a decision Advait made while testing 
 
 ## Sessions
 
-- **Sessions split on time gaps, not on app close.** A PWA can't reliably tell the server it was closed. So each time the app opens, it checks the last turn: under 30 minutes continues, 30 or more starts a new session and grades the old one. Goodbye ends and grades right away. No timers, no "unfinished" marker.
-- **One session summary everywhere: "12 min · 3 fixes".** Same line at the end of a chat, in the session list and on session detail. Both numbers are counted in code, so it never waits for grading. Per-session level change was left out.
+- **A session is one day (4am to 4am, Tokyo time).** A PWA can't reliably tell the server it was closed, so nothing depends on a close event. A 30-minute gap rule was tried first; one session per day is simpler and matches minutes per day, the chart and the mastery rule. Goodbye grades the day so far; coming back the same day continues it. No timers, no "unfinished" marker.
+- **One session summary everywhere: "12 min · +4 words · 3 fixes".** North star first, then progress, then fixes. "+4 words" counts words and patterns that moved up, because the level itself barely moves in one session and "+0%" would demotivate.
+- **No interrupting Yui in v0.** Her replies are short at N5. The mic is off while she speaks. Interrupting is backlog.
+- **No separate test version for one user.** Tests before deploy, version in logs, one-step rollback and daily backups instead. A test version is backlog.
+- **Mastery: a mixed day counts as wrong, and 3 days is a setting.** The spacing and retrieval ideas are well researched; the number 3 is not.
