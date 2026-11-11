@@ -156,7 +156,9 @@ rt{font-size:.48em;color:var(--muted);font-weight:400;letter-spacing:.02em}
 .meter i{display:block;height:100%;background:var(--accent);border-radius:4px}
 .part{display:flex;flex-direction:column;gap:5px}
 .part .row{display:flex;justify-content:space-between;gap:10px;font-size:14px}
-.part .row b{font-weight:500}
+.part .row b{font-weight:500;display:flex;align-items:center;gap:6px}
+.info{width:18px;height:18px;border-radius:50%;border:1px solid var(--faint);color:var(--muted);font-size:11px;font-style:italic;font-family:Georgia,serif;display:grid;place-items:center;line-height:1}
+.info[aria-expanded="true"]{background:var(--fg);color:var(--app);border-color:var(--fg)}
 .part .row span{color:var(--muted);font-variant-numeric:tabular-nums}
 .part p{margin:0;font-size:12.5px;color:var(--muted)}
 .list{display:flex;flex-direction:column;background:var(--surface);border-radius:12px}
@@ -313,6 +315,8 @@ function chart(){
   const g10=H-20-10/max*(H-34);
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Minutes per day, last 14 days"><line x1="${pad}" x2="${W-pad}" y1="${g10}" y2="${g10}" stroke="var(--line)" stroke-dasharray="3 3"/><text x="${W-pad+2}" y="${g10+3}" font-size="9" fill="var(--faint)">10m</text>${bars}</svg>`;
 }
+let openInfo=null;
+const part=(label,value,pct,info)=>`<div class="part"><div class="row"><b>${label}<button class="info" data-info="${label}" aria-expanded="${openInfo===label}" aria-label="What is ${label}?">i</button></b><span>${value}</span></div><div class="meter"><i style="width:${pct}%"></i></div>${openInfo===label?`<p>${info}</p>`:""}</div>`;
 function you(){
   if(youEmpty) return sub("You", `
     <div class="stats"><div class="stat"><b>0</b><span>min today</span></div><div class="stat"><b>0</b><span>min this week</span></div><div class="stat"><b>0</b><span>day streak</span></div></div>
@@ -323,11 +327,11 @@ function you(){
     <div class="stats"><div class="stat"><b>12</b><span>min today</span></div><div class="stat"><b>65</b><span>min this week</span></div><div class="stat"><b>5</b><span>day streak</span></div></div>
     <div class="section"><h2>Last 14 days</h2><div class="chart">${chart()}</div></div>
     <div class="section"><h2>Level</h2><div class="level">
-      <div class="big">N5 · 6% <small>of the way to N4</small></div>
+      <div class="big">N5 · 6% <small>to N4</small></div>
       <div class="meter"><i style="width:6%"></i></div>
-      <div class="part"><div class="row"><b>Vocabulary</b><span>96 of 1,500 words</span></div><div class="meter"><i style="width:6.4%"></i></div><p>Words you used correctly on 3 different days. 41 more are still being learned.</p></div>
-      <div class="part"><div class="row"><b>Grammar</b><span>14 of 200 patterns</span></div><div class="meter"><i style="width:7%"></i></div><p>Patterns you used correctly on 3 different days. 9 more are still being learned.</p></div>
-      <div class="part"><div class="row"><b>Quality</b><span>×0.95</span></div><div class="meter"><i style="width:84%"></i></div><p>71% of your Japanese replies had no fix. You knew about 96% of Yui's words. Last 5 sessions.</p></div>
+      ${part("Words","96 / 1,500",6.4,"Words you used correctly on 3 different days. 41 more are still being learned.")}
+      ${part("Grammar","14 / 200",7,"Patterns you used correctly on 3 different days. 9 more are still being learned.")}
+      ${part("Quality","71% fix-free",84,"71% of your Japanese replies had no fix. You knew about 96% of Yui's words. Last 5 sessions.")}
     </div></div>
     <div class="section"><h2>Sessions</h2><div class="list">
       <button class="item" data-go="session"><div class="main"><b>Today</b><span>12 min · 3 fixes · a movie you watched</span></div><span class="go">›</span></button>
@@ -364,6 +368,7 @@ document.addEventListener("click",e=>{
   const b=e.target.closest("button"); if(!b) return;
   if(b.dataset.go) return go(b.dataset.go);
   if(b.dataset.state){ clearTimeout(timer); state=b.dataset.state; return render(); }
+  if(b.dataset.info){ openInfo = openInfo===b.dataset.info ? null : b.dataset.info; const y=document.getElementById("scroll").scrollTop; render(); document.getElementById("scroll").scrollTop=y; return; }
   if(b.dataset.empty){ youEmpty=b.dataset.empty==="1"; return render(); }
   if(b.id==="mic"){
     clearTimeout(timer);

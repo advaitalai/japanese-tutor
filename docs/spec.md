@@ -115,7 +115,7 @@ score = (0.55 × mastered_words / 1500 + 0.45 × mastered_patterns / 200)
 - Accuracy: his Japanese replies with no fix, divided by all his Japanese replies, averaged over the last 5 sessions. Counted in code.
 - Understanding: share of Yui's chat words he knew, averaged over the last 5 sessions.
 
-The profile shows each part as a bar with a plain explanation, so he can see why the number is what it is.
+The profile shows each part as a label, a number and a bar. The plain explanation of each sits behind a small info button, so he can see why the number is what it is without reading it every time.
 
 In the prototype, words and patterns used correctly come from a grading pass by the model, and understanding is a model estimate. In the real app, understanding is counted in code: a Japanese tokenizer splits Yui's lines into words and checks them against his known set (used correctly: known; asked about: unknown; heard and answered sensibly: probably known; otherwise unconfirmed).
 
