@@ -99,28 +99,120 @@ There are two screens and two sub-views. Opening the app lands on Yui; the only 
 
 Edge states (no mic permission, offline, Yui fails to reply, very long silence) get a design pass after v0.
 
+## Learning model
+
+How Yui decides what to practice, and how progress is measured. Every number in this section is a setting to tune from real use, not a fixed rule.
+
+### Glossary
+
+| Term | Meaning |
+| --- | --- |
+| Turn | One message from one side: what he says between two mic taps, or one reply from Yui. |
+| Exchange | His turn plus her reply. |
+| Session | All turns in one day, 4am to 4am Tokyo time. |
+| Thread | All sessions, start to finish. |
+| Mode | What Yui is doing on a turn: chat, sidebar or end (goodbye). |
+| Item | One thing he can learn, tracked on its own: a word, a grammar point, or a member of a set. |
+| Syllabus | The full list of items for N5 and N4. |
+| Use | He produces an item in one of his chat turns. Correct if no fix touches it, wrong if a fix does. |
+| Fix | A correction of a mistake in one of his chat turns, tagged with the item it's about. |
+| Evidence | The record of correct and wrong uses of an item, by day. |
+| Known | He can follow the item when Yui says it. Drives understanding. |
+| Mastered | He has used the item correctly on 3 different days. Drives the level score. |
+| Learning | He has used the item correctly on 1 or 2 days. |
+| Due | An item whose next practice date has come. |
+| Target | An item picked for today's session. |
+| Grading | The job that reads a day's turns and updates evidence, memory and the next plan. |
+| Accuracy | The share of his Japanese chat turns with no fix. |
+| Understanding | The share of words in Yui's chat turns that he knows. |
+
+### Item kinds
+
+| Kind | What it is | Examples |
+| --- | --- | --- |
+| Word | One vocabulary entry in dictionary form. Set phrases count as words. | 食べる, 映画, おもしろい, お疲れさまです |
+| Grammar point | A rule for building sentences. Each meaning of a particle is its own point. | 〜ました (polite past), 〜たい (want to), い-adjective past, に for where you go, に for a time |
+| Set | A closed group of forms with irregular readings, learned together. Each member is tracked as its own item; the set's progress is the share of members mastered. | Numbers, counters (〜つ, 〜人, 〜本: いっぽん, さんぼん), days of the month (ついたち, ふつか), telling time (〜分: ふん, ぷん), prices |
+
+Out of v0: kanji reading as an item (see Fading furigana in the backlog) and politeness levels (Yui stays in です/ます).
+
+Each item records: kind, level (N5 or N4), form, reading, meaning, prerequisites (〜ました needs the ます form), how Yui can set up a chance to use it (〜ました: ask about yesterday), and how a use is detected (rule or model, below).
+
+### Item states
+
+| | Known | Mastered |
+| --- | --- | --- |
+| Skill | Following it when Yui says it | Saying it correctly himself |
+| How he gets there | All N5 items start known (he passed N5). Anything else becomes known on his first correct use. | Correct use on 3 different days |
+| How he loses it | He asks about it in a sidebar, or says わかりません or もういちど right after Yui uses it | A wrong use removes a day |
+| What it drives | Understanding | Level score |
+
+Mastered items are always known. At the start, nearly all of N5 is known and nothing is mastered.
+
+Mastery details: a day with both a correct and a wrong use of an item counts as wrong. Mastered items still come back for review every few weeks; a wrong use then drops them back to learning.
+
+### Fixes and items
+
+- Every fix is tagged with the item it's about (みるました → 見ました is tagged 〜ました). The model proposes the tag; the app checks it names a real item. A fix with no matching item is still shown, just not tracked.
+- On screen, all fixes from one turn share one card, in the order they appear in his sentence.
+- An item is "recently fixed" if it got a fix in the last 7 days and hasn't been used correctly since.
+
+### Session planning
+
+Three parts get Yui ready for each day.
+
+1. **Scheduler (code).** Learning items get a next practice date, spaced out: 1 day, then 3, then 7. At the first turn of the day it picks the targets:
+
+   | Slot | Count | Picks | Why |
+   | --- | --- | --- | --- |
+   | Repair | up to 2 | Recently fixed items, ranked by times fixed, then most recent, then N5 before N4 | A mistake is easiest to fix while it's fresh |
+   | Review | up to 3 | Due learning items, most overdue first | Losing half-learned items is the bigger waste |
+   | New | 2 | Next unseen items from the syllabus whose prerequisites are known | New items need more chances: hear Yui use it, then use it |
+
+   Reviews come before new: when more than 10 items are due, new drops to 1, and to 0 above 20. When understanding falls below 95%, no new items until it recovers. Any item he uses correctly counts, target or not.
+
+2. **Planner (stronger model, once a day).** Takes the targets, memory and recent topics, and writes a short plan: how to set up each target naturally (past tense: ask about his weekend; counters: ask how many people came), a follow-up from last time, and how hard to pitch.
+
+3. **Live tracking (code, every turn).** After each of his turns, code checks which targets he used. Her next prompt says which are done and which are left, so she moves on instead of repeating.
+
+Yui's prompt each turn carries: the plan, targets left, his level, known and learning items, recent fixes, things he asked about, facts and topics, and how long since they last talked.
+
+### Detecting uses
+
+- **Tokenizer** (Sudachi or MeCab, off the shelf): splits Japanese into words with dictionary form, reading, part of speech and conjugation. It knows nothing about our items.
+- **Words:** dictionary form matched to the word item. Reliable.
+- **Grammar points:** a small rule per point, run on tokenizer output (verb stem + ます + た = 〜ました). Reliable for forms. Points that depend on meaning (に for a place vs a time) are marked "model" and the grading model tags them.
+- **Sets:** numbers and counters found from tokenizer output.
+- **Risk:** speech-to-text tends to clean up what it hears. If he says さんほん it may write 3本, hiding the mistake. Choosing a speech-to-text provider includes testing it on real learner mistakes.
+
+### Understanding and accuracy
+
+- **Accuracy** (code): his Japanese chat turns with no fix, divided by all his Japanese chat turns, last 5 sessions.
+- **Understanding** (code): for Yui's chat turns, the share of word occurrences he knows. It uses words because the research on how much of a text you need to know to follow it (95 to 98%) is about words.
+- **Grammar** is a rule on Yui's lines, not part of the score: at most one grammar point he hasn't learned per line.
+
 ## Level scoring
 
 The score is "N5 · X% of the way to N4", updated after each session. It borrows from spaced-repetition maturity and mastery tracking, so one good session can't move it much.
 
-Mastery rule: a word or grammar pattern counts as mastered after he uses it correctly on 3 different days. A wrong use removes one day. A day with both a correct and a wrong use of the item counts as wrong. Items with 1 or 2 days show as learning.
+Mastery rule (see Learning model): a word or grammar point counts as mastered after he uses it correctly on 3 different days. A wrong use removes one day. A day with both a correct and a wrong use of the item counts as wrong. Items with 1 or 2 days show as learning.
 
 The ideas behind the rule have strong research behind them: practice spread over days (the spacing effect) and producing a word yourself rather than recognizing it (retrieval practice). The number 3 doesn't: it's a rule of thumb and a setting to tune.
 
 The score combines coverage and quality:
 
 ```
-score = (0.55 × mastered_words / 1500 + 0.45 × mastered_patterns / 200)
+score = (0.55 × mastered_words / 1500 + 0.45 × mastered_grammar / 200)
         × (0.7 + 0.3 × (accuracy + understanding) / 2)
 ```
 
-- 1,500 words and 200 grammar patterns are rough cumulative targets through N4. JLPT publishes no official lists, so these are approximate.
+- 1,500 words and 200 grammar points are rough cumulative targets through N4. They become the real counts once the syllabus list is chosen. How sets count is decided with the syllabus.
 - Accuracy: his Japanese replies with no fix, divided by all his Japanese replies, averaged over the last 5 sessions. Counted in code.
 - Understanding: share of Yui's chat words he knew, averaged over the last 5 sessions.
 
 The profile shows each part as a label, a number and a bar. The plain explanation of each sits behind a small info button, so he can see why the number is what it is without reading it every time.
 
-In the prototype, words and patterns used correctly come from a grading pass by the model, and understanding is a model estimate. In the real app, understanding is counted in code: a Japanese tokenizer splits Yui's lines into words and checks them against his known set (used correctly: known; asked about: unknown; heard and answered sensibly: probably known; otherwise unconfirmed).
+In the prototype, items used correctly came from a grading pass by the model, and understanding was a model estimate. The real app counts both in code, as described in Learning model.
 
 ## User stories
 
@@ -184,7 +276,7 @@ What v0 must do, from Advait's side. The sections above say how things work; the
 
 **S18. First chat of a new day.** A new session starts, the previous day gets graded if it wasn't, and she greets me back knowing how long it's been and what we last talked about. The day rolls over at 4am. *unit, P0*
 
-**S19. Say goodbye.** またね, じゃあね, bye, おやすみ and similar end the session, even if the model misses it, but never from a sidebar. She says a short goodbye and I see "Session done · 12 min · +4 words · 3 fixes". Minutes and fixes show at once; "+4 words" (words and patterns that moved up today) appears when grading finishes, a few seconds later. If I come back later that day, the session continues. *unit, P0*
+**S19. Say goodbye.** またね, じゃあね, bye, おやすみ and similar end the session, even if the model misses it, but never from a sidebar. She says a short goodbye and I see "Session done · 12 min · +4 words · 3 fixes". Minutes and fixes show at once; "+4 words" (words and grammar points that moved up today) appears when grading finishes, a few seconds later. If I come back later that day, the session continues. *unit, P0*
 
 **S20. Leave without losing anything.** Minimizing pauses her voice and stops the mic. Closing the app, minimizing or switching devices never loses a turn. *live*
 
@@ -198,12 +290,12 @@ What v0 must do, from Advait's side. The sections above say how things work; the
 
 **S23. Every day gets graded.** Grading runs after each goodbye, and on the first open of a new day if the previous day wasn't graded. Grading a day again gives the same result and never double counts. A failed run is retried on the next open. *unit*
 
-**S24. Mastery takes 3 days.** A word or pattern is mastered after correct use on 3 different days. A wrong use removes a day. A day with both a correct and a wrong use counts as wrong. 1 or 2 days shows as learning. The 3 is a setting. *unit*
+**S24. Mastery takes 3 days.** A word or grammar point is mastered after correct use on 3 different days. A wrong use removes a day. A day with both a correct and a wrong use counts as wrong. 1 or 2 days shows as learning. The 3 is a setting. *unit*
 
 **S25. Level from evidence.** The score follows the formula in Level scoring, so one good session can't move it much. *unit*
 - Accuracy is counted in code: Japanese replies with no fix, divided by all Japanese replies, over the last 5 sessions. *unit*
 
-**S26. Next time is planned.** Grading picks targets for the next session, and they go into her prompt. Targets can be words, grammar patterns (〜たい, い-adjective past) or skill sets (numbers, counters, days of the month, telling time, prices). *unit*
+**S26. Next time is planned.** Grading picks targets for the next session, and they go into her prompt. Targets are picked by the scheduler (see Learning model): words, grammar points (〜たい, い-adjective past) or set members (numbers, counters, days of the month, telling time, prices). *unit*
 
 ### Profile and transcript
 
@@ -235,7 +327,7 @@ Everything below belongs to one learner. Names are suggestions for the build.
 | Turn | session_id, at, speaker (learner, yui), mode (chat, sidebar, end), text segments with readings, romaji, English parts, audio_ref | Yui's Japanese is stored as segments, each with an optional reading for furigana |
 | Fix | turn_id, wrong, right (segments), reason, at | Chat mode only |
 | Asked item | word or kanji, session_id, at | From sidebar questions |
-| Item evidence | item (word or grammar pattern), kind, correct_days[], wrong_count | Drives the mastery rule |
+| Item evidence | item (word, grammar point or set member), kind, correct_days[], wrong_count | Drives the mastery rule |
 | Session grade | session_id, accuracy, understanding, japanese_attempts, fixes_count, asked_count | One per graded session |
 | Memory | facts[] (from him), topics[] (from chats) | Not shown or editable in v0. Memory controls are backlog |
 | Learner state | level band, target words for next session | Recomputed after each session |
@@ -271,7 +363,7 @@ After two weeks of use:
 - Understanding stays around 95 to 98%; if it drops, Yui is pitched too high.
 - Fixes per Japanese reply trending down, and items moving from learning to mastered.
 
-If he keeps coming back but Yui drifts above his level, build the code-based understanding count next. If he stops coming back, the problem is the character or the format, not the syllabus.
+If he keeps coming back but understanding drops, Yui is pitched too high: tighten the grammar rule and slow new items. If he stops coming back, the problem is the character or the format, not the syllabus.
 
 ## Backlog
 
@@ -283,7 +375,6 @@ Ordered roughly by when it's likely to matter.
 | Better definition of a fix | Conversation | Teach spoken Japanese: casual speech isn't a mistake, typing spellings are ignored, style tips aren't fixes |
 | Natural-sounding voices, English especially | Conversation | Built-in voices sound robotic; the English sidebar voice is the worst |
 | Sidebar questions as a level signal | Scoring | What he asks about (words, grammar, how to say things) shows exactly what he doesn't know yet |
-| Code-based understanding count | Scoring | Exact, instead of a model estimate |
 | Automatic end-of-turn detection | Conversation | Remove the second tap |
 | Interrupt Yui while she speaks | Conversation | Needed once her replies get longer, around N4 |
 | Inline assist mid-sentence ("how do I say coconut?") | Conversation | Fill a missing word without leaving the chat |
