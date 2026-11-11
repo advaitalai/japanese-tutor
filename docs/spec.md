@@ -69,9 +69,8 @@ Fixes:
 
 Memory:
 
-- Facts: a short fixed list set up once (lives in Tokyo, works in English, JLPT N5). Topics: what he talked about, stored as topics, never as claims.
-- She follows up by asking ("did you go for Indian food?"), never asserting.
-- Saying "just practice" keeps a made-up answer out of memory.
+- Whatever he says about himself is taken as true. After each session, grading saves short notes: facts about him and what they talked about.
+- She uses them to follow up naturally next time ("did you go for Indian food?").
 
 Thread and sessions:
 
@@ -136,7 +135,7 @@ Decided:
 - **Voice pipeline:** speech-to-text, then Claude, then text-to-speech, rather than a single speech-to-speech model. This keeps the raw transcript for fixes and grading, and lets captions, furigana and the English voice be controlled separately.
 - **Turn-taking:** tap to talk, tap when done, tap to interrupt. Automatic end-of-turn detection comes later, once it can tell a thinking pause from a finished sentence.
 - **Two voices:** a Japanese voice for every Japanese part and an English voice for sidebar English. Each reply is a list of parts tagged with language.
-- **Structured replies:** Yui returns JSON: mode, parts, fixes, asked items, whether his message was a Japanese attempt, practice flag. The app, not the model, decides goodbyes, routes "how do I say" to the sidebar, blocks corrections in sidebars, filters false fixes, and counts accuracy.
+- **Structured replies:** Yui returns JSON: mode, parts, fixes, asked items, whether his message was a Japanese attempt. The app, not the model, decides goodbyes, routes "how do I say" to the sidebar, blocks corrections in sidebars, filters false fixes, and counts accuracy.
 - **Prompts live on the server** as a system prompt, with learner state injected each turn (level, known items, recent fixes, asked items, targets, facts, topics). Messages from him can't change her rules.
 - **Japanese text:** readings for furigana and word splitting come from a Japanese tokenizer such as Sudachi or MeCab, not from the model. The prototype used model readings and occasionally got one wrong.
 - **Grading job:** runs server-side when a session closes (goodbye or inactivity). It updates item evidence, the session grade, topics and next targets.
@@ -175,12 +174,13 @@ Ordered roughly by when it's likely to matter.
 | Inline assist mid-sentence ("how do I say coconut?") | Conversation | Fill a missing word without leaving the chat |
 | Session synopsis: what went well, one gap, next time | Wrap-up | Only once the next sessions actually act on it |
 | Memory controls: see, add and delete facts and topics | Memory | Fix something Yui remembered wrong, or tell her a new fact |
+| Keep made-up answers out of memory ("just practice") | Memory | He sometimes invents answers to keep talking, and Yui repeating them back feels off |
 | Progress over time: level, vocabulary, grammar, kanji | Profile | Progress is motivating |
 | Fading furigana on kanji he can read | Captions | Builds kanji reading |
 | Captions toggle | Captions | Hide romaji or captions as he improves |
 | Provisional score until enough sessions | Scoring | Avoid early noise |
 | Quick vocabulary check every week or two | Scoring | Confirms items marked unconfirmed |
-| Onboarding tips for new users | Onboarding | Only if it expands beyond Advait: what to ask, もういちど, "just practice", how to say bye |
+| Onboarding tips for new users | Onboarding | Only if it expands beyond Advait: what to ask, もういちど, how to say bye |
 | Rehearsal for real situations (life admin, work) | Conversation | Practice a call or meeting before it happens |
 | Real-person minutes tracking | Metrics | The real north star |
 | Daily nudge written by Yui | Engagement | Brings him back |
