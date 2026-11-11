@@ -119,6 +119,107 @@ The profile shows each part as a label, a number and a bar. The plain explanatio
 
 In the prototype, words and patterns used correctly come from a grading pass by the model, and understanding is a model estimate. In the real app, understanding is counted in code: a Japanese tokenizer splits Yui's lines into words and checks them against his known set (used correctly: known; asked about: unknown; heard and answered sensibly: probably known; otherwise unconfirmed).
 
+## User stories
+
+What v0 must do, from Advait's side. The sections above say how things work; these say what "done" means. Each check says how it's tested:
+
+- **unit**: an offline code test. No network, no AI, runs in seconds.
+- **P0**: a scripted end-to-end scenario with the real model, run before shipping.
+- **live**: Advait tries it on his phone or Mac.
+
+### Conversation
+
+**S1. Talk to Yui by voice.** I tap the mic, speak, tap again, and Yui answers out loud.
+- My speech becomes text and her reply plays in the Japanese voice. *live*
+- There's no time limit while I think before tapping done. *unit*
+- She starts speaking about 1.5 seconds after my tap, most of the time. Measured from logs. *live*
+
+**S2. Interrupt her.** I tap the mic while she's talking, she stops, and I can talk. *live*
+
+**S3. Read along.** Everything she says in Japanese shows with kanji, furigana over every kanji word, and romaji underneath.
+- Readings and word splits come from the tokenizer, not the model. *unit*
+- Every piece with kanji has a reading; kana-only pieces don't. *unit*
+
+**S4. She leads, at my level.** One or two short sentences, N5 words plus words I know, です/ます, ending with one easy question about my life. *P0*
+- My known words, recent fixes and target words are in her prompt every turn. *unit*
+
+**S5. Repeat, slower, simpler.** もういちど repeats her last line exactly. ゆっくり repeats it slower. わかりません gets a simpler version. *P0*
+
+**S6. Say it in English.** If I make a statement in English, she first gives me the Japanese for it, then replies. *P0*
+
+### Sidebar
+
+**S7. Ask about Japanese, in any language.** What a word means, a kanji, why, how to use something, or about a fix. She answers in short English (under 30 words) with at most one Japanese example, which the Japanese voice reads. *P0*
+- Japanese never appears inside an English part. *unit*
+- "How do I say X?" opens a sidebar even if the model misses it. *unit*
+
+**S8. Go as deep as I like.** Follow-up questions stay in the sidebar. She never pushes me back. *P0*
+
+**S9. Her question waits.** During a sidebar, her waiting question stays pinned with furigana and romaji, plus recent fixes. *live*
+
+**S10. Back to the chat.** When I say ok, got it, わかった, or answer her question in Japanese, she goes back to chat and invites me to use what I just learned. *P0*
+
+**S11. The sidebar is safe.** Nothing I say in a sidebar gets a fix, shown or logged. *unit*
+
+### Fixes
+
+**S12. Every mistake gets a card.** In chat mode, each mistake shows above her reply: my words struck through, the correct version with furigana, and a reason under 12 words. Several fixes share one card. *P0*
+
+**S13. No fake fixes.** A fix is dropped if its "wrong" text isn't in what I said, or if it equals the correction. Romaji spellings (o/wo, ou/oo) never count. *unit*
+
+**S14. Shown, not spoken.** Fixes are never read aloud. She replies normally, using the correct form. *live*
+
+**S15. Mistakes come back.** Recent fixes go into her prompt, so she gives me chances to use the right form. *unit*
+
+### Sessions
+
+**S16. First open.** The only prompt is mic permission. Then Yui says hello in one line and asks an easy question. *live*
+
+**S17. Back within 30 minutes.** Same session. Her last line is on screen and it's my turn. She doesn't repeat herself. *unit, live*
+
+**S18. Back after 30 minutes or more.** A new session starts, the old one gets graded, and she greets me back knowing how long it's been and what we last talked about. *unit, P0*
+
+**S19. Say goodbye.** またね, じゃあね, bye, おやすみ and similar end the session, even if the model misses it, but never from a sidebar. She says a short goodbye and I see "Session done · 12 min · 3 fixes". The next thing I say starts a new session. *unit, P0*
+
+**S20. Leave without losing anything.** Minimizing pauses her voice and stops the mic. Closing the app, minimizing or switching devices never loses a turn. *live*
+
+**S21. Either device.** My phone and my Mac show the same thread. The 30-minute rule uses server time. *live*
+
+### Memory
+
+**S22. She remembers me.** After each session, grading saves facts I said about myself and what we talked about. Next time she follows up naturally ("インド料理、食べましたか？"). *P0*
+
+### Progression
+
+**S23. Every session gets graded once.** Grading runs right after goodbye, or when I next open the app after a gap. It never grades a session twice, and a failed run is retried on the next open. *unit*
+
+**S24. Mastery takes 3 days.** A word or pattern is mastered after correct use on 3 different days. A wrong use removes a day. 1 or 2 days shows as learning. *unit*
+
+**S25. Level from evidence.** The score follows the formula in Level scoring, so one good session can't move it much. *unit*
+- Accuracy is counted in code: Japanese replies with no fix, divided by all Japanese replies, over the last 5 sessions. *unit*
+
+**S26. Next time is planned.** Grading picks 2 or 3 target words for the next session, and they go into her prompt. *unit*
+
+### Profile and transcript
+
+**S27. My talk time.** Minutes today and this week, streak, and a 14-day chart. Active time counts gaps between turns, up to 90 seconds each. *unit, live*
+
+**S28. My level.** "N5 · X% to N4", with words, grammar and quality rows. Each row's explanation sits behind an info button. Empty until my first graded session. *live*
+
+**S29. Past sessions.** A list with date, summary line and topic. Each opens to its summary line, fixes, words I asked about and transcript. *live*
+
+**S30. The whole thread.** The transcript shows everything, with a date divider per session and fixes inline, scrolled to the latest line. *live*
+
+### Running it
+
+**S31. Sign in once per device.** Only I can use the app or see my data. How is still open (see Technical decisions). *live*
+
+**S32. Errors in plain words.** If a key stops working or Yui fails to reply, I see one plain line, such as "Yui can't reply right now. The Claude key needs replacing." Never vendor JSON. Each key is checked at startup and a failure is logged clearly. Full edge-state designs stay in the backlog. *unit*
+
+**S33. Claude can debug from logs.** Every turn logs what I said, her reply, the mode, fixes kept and dropped with the reason, and latency. Startup logs the app version. Claude reads logs with a read-only key. *live*
+
+**S34. Test before live.** A test version runs next to the live one, with its own data. Changes go live only when I say "ship it". *live*
+
 ## Data model
 
 Everything below belongs to one learner. Names are suggestions for the build.
