@@ -401,3 +401,6 @@ Ordered roughly by when it's likely to matter.
 - Is 4am the right day rollover? It keeps a late-night chat with that evening's session.
 - Can Yui speak first when the app opens? Chrome allows sound in an installed app, but this needs testing on his phone and Mac early in the build. If blocked, her line shows and she speaks on his first tap.
 - Does a face earn its cost, and when do we test it?
+- Syllabus source: which N5 and N4 lists, and how sets count toward the level.
+- Keep S32 (errors in plain words)?
+- Sign-in: how he signs in on each device.

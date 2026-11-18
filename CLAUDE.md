@@ -4,7 +4,7 @@ A voice-first Japanese conversation partner for one learner, Advait (JLPT N5, To
 
 ## Read first
 
-- `docs/spec.md`: what v0 is. This is the source of truth for scope and behavior.
+- `docs/spec.md`: what v0 is. This is the source of truth for scope and behavior. Advait reviews and comments on a copy in Claude Docs (https://claude.ai/artifact/QeCT2BZ3avdraowxUA56wq); keep both in sync when the spec changes.
 - `docs/decisions.md`: why things are the way they are. Check it before proposing something that was already tried and cut.
 - `docs/prompts.md`: Yui's conversation prompt and the grading prompt from the v0.9 prototype, plus the rules the prototype enforced in code.
 - `docs/problem-statement.md`: the original problem framing. Where it disagrees with the spec, the spec wins.
