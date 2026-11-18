@@ -226,7 +226,7 @@ const yesterday = [
   {q:"What does yakimashita mean?"},
   {en:"It means baked. It's the past form of this verb, to bake:",ex:L.y3},
   {q:"ok got it"},{y:L.y4},{me:"はい、パンがすきです。",r:"Hai, pan ga suki desu."},{y:L.y5},
-  {me:"またね！",r:"Mata ne!"},{end:"Session done · 9 min · +2 words · no fixes"}
+  {me:"またね！",r:"Mata ne!"},{end:"Session done · 9 min · 2 used well · no fixes"}
 ];
 const today = [
   {y:L.greet},{me:"きのう、えいがをみるました。",r:"Kinou, eiga o mirumashita.",fix:[F.miru]},{y:L.ask},
@@ -235,7 +235,7 @@ const today = [
   {q:"ok"},{y:L.again},{me:"トトロを見ました。",r:"Totoro o mimashita."},{y:L.where},
   {me:"えいがかんでいきました。",r:"Eigakan de ikimashita.",fix:[F.ni]},{y:L.fun},
   {me:"はい、とてもおもしろいでした。",r:"Hai, totemo omoshiroi deshita.",fix:[F.kat]},{y:L.good},
-  {me:"またね！",r:"Mata ne!"},{y:L.bye},{end:"Session done · 12 min · +4 words · 3 fixes"}
+  {me:"またね！",r:"Mata ne!"},{y:L.bye},{end:"Session done · 12 min · 4 used well · 3 fixes"}
 ];
 function threadHTML(lines){
   return lines.map(x=>{
@@ -276,7 +276,7 @@ function conversation(){
     mid = `
       <div class="mine"><div class="label">You</div><div class="jp">またね！</div><div class="romaji">Mata ne!</div></div>
       <div class="yui">${jp(L.bye)}</div>
-      <div class="done">Session done · 12 min · +4 words · 3 fixes</div>`;
+      <div class="done">Session done · 12 min · 4 used well · 3 fixes</div>`;
   } else {
     const mine = s==="thinking"
       ? `<div class="mine"><div class="label">You</div><div class="jp">トトロを見ました。</div><div class="romaji">Totoro o mimashita.</div></div>`
@@ -334,15 +334,15 @@ function you(){
       ${part("Quality","71% fix-free",84,"71% of your Japanese replies had no fix. You knew about 96% of Yui's words. Last 5 sessions.")}
     </div></div>
     <div class="section"><h2>Sessions</h2><div class="list">
-      <button class="item" data-go="session"><div class="main"><b>Today</b><span>12 min · +4 words · 3 fixes · a movie you watched</span></div><span class="go">›</span></button>
-      <button class="item" data-go="session"><div class="main"><b>Yesterday</b><span>9 min · +2 words · no fixes · Yui's bakery</span></div><span class="go">›</span></button>
-      <button class="item" data-go="session"><div class="main"><b>Sun, Nov 8</b><span>13 min · +3 words · 2 fixes · weekend plans</span></div><span class="go">›</span></button>
-      <button class="item" data-go="session"><div class="main"><b>Sat, Nov 7</b><span>6 min · +1 word · 1 fix · work</span></div><span class="go">›</span></button>
+      <button class="item" data-go="session"><div class="main"><b>Today</b><span>12 min · 4 used well · 3 fixes · a movie you watched</span></div><span class="go">›</span></button>
+      <button class="item" data-go="session"><div class="main"><b>Yesterday</b><span>9 min · 2 used well · no fixes · Yui's bakery</span></div><span class="go">›</span></button>
+      <button class="item" data-go="session"><div class="main"><b>Sun, Nov 8</b><span>13 min · 3 used well · 2 fixes · weekend plans</span></div><span class="go">›</span></button>
+      <button class="item" data-go="session"><div class="main"><b>Sat, Nov 7</b><span>6 min · 1 used well · 1 fix · work</span></div><span class="go">›</span></button>
     </div></div>`, "conversation", "Yui");
 }
 function session(){
   return sub("Today", `
-    <div class="summary">12 min · +4 words · 3 fixes</div>
+    <div class="summary">12 min · 4 used well · 3 fixes</div>
     <div class="section"><h2>Fixes</h2><div class="fix">${[F.miru,F.ni,F.kat].map(fixRow).join("")}</div></div>
     <div class="section"><h2>You asked about</h2><div class="list"><div class="item"><div class="main"><b class="jp"><ruby>何<rt>なん</rt></ruby>の</b><span>what kind of, which</span></div></div></div></div>
     <div class="section"><h2>Transcript</h2></div>${threadHTML(today)}`, "you", "You");

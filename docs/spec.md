@@ -27,7 +27,7 @@ In:
 - Sidebar help in English, as deep as he likes, with Yui's question kept waiting.
 - A correction on screen for every mistake in chat mode, logged for scoring.
 - One continuous thread split into sessions, one session per day. The day rolls over at 4am Tokyo time.
-- One summary line per session, "12 min · +4 words · 3 fixes": minutes first, then progress, then fixes. The same line shows at the end of a chat, in the session list and on session detail.
+- One summary line per session, "12 min · 4 used well · 3 fixes": minutes first, then progress, then fixes. "Used well" counts words and grammar points he used correctly on a new day. The same line shows at the end of a chat, in the session list and on session detail.
 - Profile: talk minutes, a 14-day chart, the level score with its breakdown, and sessions with transcripts.
 - Memory: facts he gives, and topics from chats.
 
@@ -82,7 +82,7 @@ Thread and sessions:
   - First open of a new day: a new session starts. If the previous day wasn't graded, it's graded in the background. Yui speaks first and greets him back, knowing how long it's been and what they last talked about.
   - No turns at all (first open ever): after the mic permission prompt, Yui speaks first with a one-line hello and an easy question.
 - Goodbye gets her goodbye and grades the day so far. If he comes back later the same day, the session continues and the next goodbye grades it again. Grading is per day, so grading a day twice never double counts.
-- Minutes and fixes are counted in code as he talks and show at once. "+4 words" needs grading, so it appears a few seconds after goodbye, or the next day if he never said goodbye.
+- Minutes and fixes are counted in code as he talks and show at once. "4 used well" needs grading, so it appears a few seconds after goodbye, or the next day if he never said goodbye.
 - The 4am rollover is one config value.
 - Leaving for the profile pauses her voice; the conversation is untouched. The mic stops listening while he's away.
 
@@ -92,7 +92,7 @@ There are two screens and two sub-views. Opening the app lands on Yui; the only 
 
 | Screen | What it shows | States |
 | --- | --- | --- |
-| Conversation (landing) | Yui's face area, her current line as captions, his last line, a Transcript button, a You button | First open (Yui says hello); welcome back (first chat of the day, Yui speaks first); Yui talking; his turn; listening; thinking; sidebar (waiting question pinned); fix card above her reply; session done line ("Session done · 12 min · +4 words · 3 fixes") |
+| Conversation (landing) | Yui's face area, her current line as captions, his last line, a Transcript button, a You button | First open (Yui says hello); welcome back (first chat of the day, Yui speaks first); Yui talking; his turn; listening; thinking; sidebar (waiting question pinned); fix card above her reply; session done line ("Session done · 12 min · 4 used well · 3 fixes") |
 | Transcript | The whole thread, with a date divider per session, fixes inline | Scrolled to the latest line |
 | Profile (You) | Minutes this week and today, streak; a 14-day bar chart; level score with breakdown; session list (date, summary line, topic) | Empty before the first session; level empty until the first graded session |
 | Session detail | Summary line, fixes, words he asked about, full transcript of that session | None |
@@ -112,12 +112,13 @@ How Yui decides what to practice, and how progress is measured. Every number in 
 | Session | All turns in one day, 4am to 4am Tokyo time. |
 | Thread | All sessions, start to finish. |
 | Mode | What Yui is doing on a turn: chat, sidebar or end (goodbye). |
-| Item | One thing he can learn, tracked on its own: a word, a grammar point, or a member of a set. |
+| Item | One thing he can learn, tracked on its own: a word, a grammar point, or a member of a set. Items come from the syllabus, or are his own (below). |
 | Syllabus | The full list of items for N5 and N4. |
 | Use | He produces an item in one of his chat turns. Correct if no fix touches it, wrong if a fix does. |
 | Fix | A correction of a mistake in one of his chat turns, tagged with the item it's about. |
+| Tag | The item a fix is about. One fix has one tag. |
 | Evidence | The record of correct and wrong uses of an item, by day. |
-| Known | He can follow the item when Yui says it. Drives understanding. |
+| Known | He can follow the item when Yui says it. An estimate (see Item states). Drives understanding. |
 | Mastered | He has used the item correctly on 3 different days. Drives the level score. |
 | Learning | He has used the item correctly on 1 or 2 days. |
 | Due | An item whose next practice date has come. |
@@ -134,6 +135,10 @@ How Yui decides what to practice, and how progress is measured. Every number in 
 | Grammar point | A rule for building sentences. Each meaning of a particle is its own point. | 〜ました (polite past), 〜たい (want to), い-adjective past, に for where you go, に for a time |
 | Set | A closed group of forms with irregular readings, learned together. Each member is tracked as its own item; the set's progress is the share of members mastered. | Numbers, counters (〜つ, 〜人, 〜本: いっぽん, さんぼん), days of the month (ついたち, ふつか), telling time (〜分: ふん, ぷん), prices |
 
+Word or grammar point: a form that attaches to other words and changes with them is a grammar point (〜みたいです, it seems: N4). A fixed phrase said whole and unchanged is a word (お疲れさまです).
+
+His own items: a word that is fixed or asked about but isn't on the syllabus lists (解約, cancel a contract) becomes one of his own items, tracked the same way.
+
 Out of v0: kanji reading as an item (see Fading furigana in the backlog) and politeness levels (Yui stays in です/ます).
 
 Each item records: kind, level (N5 or N4), form, reading, meaning, prerequisites (〜ました needs the ます form), how Yui can set up a chance to use it (〜ました: ask about yesterday), and how a use is detected (rule or model, below).
@@ -149,11 +154,13 @@ Each item records: kind, level (N5 or N4), form, reading, meaning, prerequisites
 
 Mastered items are always known. At the start, nearly all of N5 is known and nothing is mastered.
 
+Known is an estimate. Signs he followed a line: he answers her question sensibly and on topic, in any language. Signs he didn't: he asks about it, says わかりません or もういちど, or his answer is off topic. The grading model judges "sensibly".
+
 Mastery details: a day with both a correct and a wrong use of an item counts as wrong. Mastered items still come back for review every few weeks; a wrong use then drops them back to learning.
 
 ### Fixes and items
 
-- Every fix is tagged with the item it's about (みるました → 見ました is tagged 〜ました). The model proposes the tag; the app checks it names a real item. A fix with no matching item is still shown, just not tracked.
+- Every fix is tagged with the item it's about (みるました → 見ました is tagged 〜ました). The model proposes the tag; the app checks it names a real item. A fix about a word outside the syllabus (キャンセル → 解約) adds that word as one of his own items.
 - On screen, all fixes from one turn share one card, in the order they appear in his sentence.
 - An item is "recently fixed" if it got a fix in the last 7 days and hasn't been used correctly since.
 
@@ -168,6 +175,18 @@ Three parts get Yui ready for each day.
    | Repair | up to 2 | Recently fixed items, ranked by times fixed, then most recent, then N5 before N4 | A mistake is easiest to fix while it's fresh |
    | Review | up to 3 | Due learning items, most overdue first | Losing half-learned items is the bigger waste |
    | New | 2 | Next unseen items from the syllabus whose prerequisites are known | New items need more chances: hear Yui use it, then use it |
+
+   Example of one day's output:
+
+   | Slot | Item | Why | How Yui sets it up |
+   | --- | --- | --- | --- |
+   | Repair | 〜ました (polite past) | Fixed twice this week | Ask what he did yesterday |
+   | Repair | に for where you go | Fixed on Tuesday | Ask where he went |
+   | Review | 映画 | Due today (3-day step) | Ask about movies |
+   | Review | 〜たい | Due, 2 days overdue | Ask what he wants to do this weekend |
+   | Review | 〜人 (counter) | Due today | Ask how many people came |
+   | New | 〜てください | Next on the list, prerequisites known | Ask her to tell him something |
+   | New | 先週 | Next on the list | Ask about last week |
 
    Reviews come before new: when more than 10 items are due, new drops to 1, and to 0 above 20. When understanding falls below 95%, no new items until it recovers. Any item he uses correctly counts, target or not.
 
@@ -220,18 +239,18 @@ What v0 must do, from Advait's side. The sections above say how things work; the
 
 - **unit**: an offline code test. No network, no AI, runs in seconds.
 - **P0**: a scripted end-to-end scenario with the real model, run before shipping.
-- **live**: Advait tries it on his phone or Mac.
+- **on device**: Advait tries it on his phone or Mac.
 
 ### Conversation
 
 **S1. Talk to Yui by voice.** I tap the mic, speak, tap again, and Yui answers out loud.
-- My speech becomes text and her reply plays in the Japanese voice. *live*
-- It works with normal background noise: a café, a street, a train platform. *live*
-- I always see what it heard, so a mishearing is obvious and I can say it again. *live*
+- My speech becomes text and her reply plays in the Japanese voice. *on device*
+- It works with normal background noise: a café, a street, a train platform. *on device*
+- I always see what it heard, so a mishearing is obvious and I can say it again. *on device*
 - There's no time limit while I think before tapping done. *unit*
-- She starts speaking about 1.5 seconds after my tap, most of the time. Measured from logs. *live*
+- She starts speaking about 1.5 seconds after my tap, most of the time. Measured from logs. *on device*
 
-**S2. She finishes, then I talk.** The mic is off while she speaks and comes back when she's done. Interrupting is backlog. *live*
+**S2. She finishes, then I talk.** The mic is off while she speaks and comes back when she's done. Interrupting is backlog. *on device*
 
 **S3. Read along.** Everything she says in Japanese shows with kanji, furigana over every kanji word, and romaji underneath.
 - Readings and word splits come from the tokenizer, not the model. *unit*
@@ -252,7 +271,7 @@ What v0 must do, from Advait's side. The sections above say how things work; the
 
 **S8. Go as deep as I like.** Follow-up questions stay in the sidebar. She never pushes me back. *P0*
 
-**S9. Her question waits.** During a sidebar, her waiting question stays pinned with furigana and romaji, plus recent fixes. *live*
+**S9. Her question waits.** During a sidebar, her waiting question stays pinned with furigana and romaji, plus recent fixes. *on device*
 
 **S10. Back to the chat.** When I say ok, got it, わかった, or answer her question in Japanese, she goes back to chat and invites me to use what I just learned. *P0*
 
@@ -264,23 +283,23 @@ What v0 must do, from Advait's side. The sections above say how things work; the
 - Fake fixes are dropped: a fix whose "wrong" text isn't in what I said, or that equals the correction. Romaji spellings (o/wo, ou/oo) never count. *unit*
 - No fixes on a turn speech-to-text wasn't confident about. *unit*
 
-**S14. Shown, not spoken.** Fixes are never read aloud. She replies normally, using the correct form. *live*
+**S14. Shown, not spoken.** Fixes are never read aloud. She replies normally, using the correct form. *on device*
 
 **S15. Mistakes come back.** Recent fixes go into her prompt, so she gives me chances to use the right form. *unit*
 
 ### Sessions
 
-**S16. First open.** The only prompt is mic permission. Then Yui says hello in one line and asks an easy question. *live*
+**S16. First open.** The only prompt is mic permission. Then Yui says hello in one line and asks an easy question. *on device*
 
-**S17. Back the same day.** Same session, continued. The last line is on screen and it's my turn. She doesn't repeat herself. *unit, live*
+**S17. Back the same day.** Same session, continued. The last line is on screen and it's my turn. She doesn't repeat herself. *unit, on device*
 
 **S18. First chat of a new day.** A new session starts, the previous day gets graded if it wasn't, and she greets me back knowing how long it's been and what we last talked about. The day rolls over at 4am. *unit, P0*
 
-**S19. Say goodbye.** またね, じゃあね, bye, おやすみ and similar end the session, even if the model misses it, but never from a sidebar. She says a short goodbye and I see "Session done · 12 min · +4 words · 3 fixes". Minutes and fixes show at once; "+4 words" (words and grammar points that moved up today) appears when grading finishes, a few seconds later. If I come back later that day, the session continues. *unit, P0*
+**S19. Say goodbye.** またね, じゃあね, bye, おやすみ and similar end the session, even if the model misses it, but never from a sidebar. She says a short goodbye and I see "Session done · 12 min · 4 used well · 3 fixes". Minutes and fixes show at once; "4 used well" (words and grammar points I used correctly on a new day) appears when grading finishes, a few seconds later. If I come back later that day, the session continues. *unit, P0*
 
-**S20. Leave without losing anything.** Minimizing pauses her voice and stops the mic. Closing the app, minimizing or switching devices never loses a turn. *live*
+**S20. Leave without losing anything.** Minimizing pauses her voice and stops the mic. Closing the app, minimizing or switching devices never loses a turn. *on device*
 
-**S21. Either device.** My phone and my Mac show the same thread. Days are counted in Tokyo time on the server. *live*
+**S21. Either device.** My phone and my Mac show the same thread. Days are counted in Tokyo time on the server. *on device*
 
 ### Memory
 
@@ -299,23 +318,23 @@ What v0 must do, from Advait's side. The sections above say how things work; the
 
 ### Profile and transcript
 
-**S27. My talk time.** Minutes today and this week, streak, and a 14-day chart. Active time counts gaps between turns, up to 90 seconds each. *unit, live*
+**S27. My talk time.** Minutes today and this week, streak, and a 14-day chart. Active time counts gaps between turns, up to 90 seconds each. *unit, on device*
 
-**S28. My level.** "N5 · X% to N4", with words, grammar and quality rows. Each row's explanation sits behind an info button. Empty until my first graded session. *live*
+**S28. My level.** "N5 · X% to N4", with words, grammar and quality rows. Each row's explanation sits behind an info button. Empty until my first graded session. *on device*
 
-**S29. Past sessions.** A list with date, summary line and topic. Each opens to its summary line, fixes, words I asked about and transcript. *live*
+**S29. Past sessions.** A list with date, summary line and topic. Each opens to its summary line, fixes, words I asked about and transcript. *on device*
 
-**S30. The whole thread.** The transcript shows everything, with a date divider per session and fixes inline, scrolled to the latest line. *live*
+**S30. The whole thread.** The transcript shows everything, with a date divider per session and fixes inline, scrolled to the latest line. *on device*
 
 ### Running it
 
-**S31. Sign in once per device.** Only I can use the app or see my data. How is still open (see Technical decisions). *live*
+**S31. Sign in once per device.** Only I can use the app or see my data. How is still open (see Technical decisions). *on device*
 
 **S32. Errors in plain words.** If a key stops working or Yui fails to reply, I see one plain line, such as "Yui can't reply right now. The Claude key needs replacing." Never vendor JSON. Each key is checked at startup and a failure is logged clearly. Full edge-state designs stay in the backlog. *unit*
 
-**S33. Claude can debug from logs.** Every turn logs what I said, her reply, the mode, fixes kept and dropped with the reason, and latency. Startup logs the app version. Claude reads logs with a read-only key. *live*
+**S33. Claude can debug from logs.** Every turn logs what I said, her reply, the mode, fixes kept and dropped with the reason, and latency. Startup logs the app version. Claude reads logs with a read-only key. *on device*
 
-**S34. A deploy never costs me my data or my day.** Tests run before every deploy. The version shows in the logs. A bad deploy can be rolled back in one step. My data is backed up daily. A separate test version is backlog. *unit, live*
+**S34. A deploy never costs me my data or my day.** Tests run before every deploy. The version shows in the logs. A bad deploy can be rolled back in one step. My data is backed up daily. A preview copy is backlog. *unit, on device*
 
 ## Data model
 
@@ -323,7 +342,7 @@ Everything below belongs to one learner. Names are suggestions for the build.
 
 | Entity | Key fields | Notes |
 | --- | --- | --- |
-| Session | id, day (4am to 4am, Tokyo time), started_at, last_activity_at, active_seconds, topic, graded_at, items_moved_up | Active time counts gaps between turns, capped at 90 seconds each |
+| Session | id, day (4am to 4am, Tokyo time), started_at, last_activity_at, active_seconds, topic, graded_at, used_well | Active time counts gaps between turns, capped at 90 seconds each |
 | Turn | session_id, at, speaker (learner, yui), mode (chat, sidebar, end), text segments with readings, romaji, English parts, audio_ref | Yui's Japanese is stored as segments, each with an optional reading for furigana |
 | Fix | turn_id, wrong, right (segments), reason, at | Chat mode only |
 | Asked item | word or kanji, session_id, at | From sidebar questions |
@@ -374,7 +393,7 @@ Ordered roughly by when it's likely to matter.
 | Latency measurement and reduction | Conversation | Slow replies break the feeling of talking to someone |
 | Better definition of a fix | Conversation | Teach spoken Japanese: casual speech isn't a mistake, typing spellings are ignored, style tips aren't fixes |
 | Natural-sounding voices, English especially | Conversation | Built-in voices sound robotic; the English sidebar voice is the worst |
-| Sidebar questions as a level signal | Scoring | What he asks about (words, grammar, how to say things) shows exactly what he doesn't know yet |
+| Sidebar questions as a level signal | Scoring | What he asks about (words, grammar, how to say things) shows exactly what he doesn't know yet. Advait wants this one |
 | Automatic end-of-turn detection | Conversation | Remove the second tap |
 | Interrupt Yui while she speaks | Conversation | Needed once her replies get longer, around N4 |
 | Inline assist mid-sentence ("how do I say coconut?") | Conversation | Fill a missing word without leaving the chat |
@@ -392,7 +411,10 @@ Ordered roughly by when it's likely to matter.
 | Daily nudge written by Yui | Engagement | Brings him back |
 | Animated face for Yui | Conversation | Connection; test voice-only, then 2D, then realistic |
 | Edge state designs | All | No mic, offline, failed replies |
-| Separate test version of the app | Running it | Protects the daily habit once a broken deploy starts costing streaks |
+| Preview copy of the app | Running it | Same VM, own address, own copy of his data. Changes land there first and go live on "ship it". About half a day of setup |
+| Shift the talking to him | Conversation | As his level rises, Yui asks more open questions, keeps her lines shorter, follows up instead of starting topics. Track his share of the words spoken |
+| English share as a signal | Metrics | Share of his turns in English, trending down as he improves |
+| Live text while he speaks | Conversation | Needs streaming speech-to-text and partial results; about 2 days of work. v0 shows his text after the second tap |
 
 ## Open questions
 
