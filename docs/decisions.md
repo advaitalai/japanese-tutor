@@ -66,3 +66,10 @@ Why v0 looks the way it does. Each line is a decision Advait made while testing 
 - **Memory items outside the syllabus become his own items.** A fixed or asked-about word like 解約 is tracked like any other item.
 - **"live" in the stories is renamed "on device".** It read as live transcription. Live text while speaking is backlog.
 - **Preview copy of the app stays in the backlog for v0.** One live app, tests and P0 runs before each deploy.
+
+## Build setup
+
+- **Sign-in is Cloudflare Access with Google, one account.** The app has a public address, so it needs a lock. Access needs no sign-in code; Tailscale (VPN always on) and built-in login (a day of security code) were the alternatives.
+- **Google for speech both ways, no bake-off.** One vendor, no extra keys (the VM's service account). Judge it from real chats in week one using the kept clips; switch if it hides his mistakes.
+- **Google Cloud setup runs as one script in Cloud Shell.** Advait creates the billing account (Japan) himself; everything else is scripted. Claude never holds owner credentials; after setup it only needs the read-only log key.
+- **Keep S32, errors in plain words.** The date planner showed raw JSON for 1.5 days when a key expired.

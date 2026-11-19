@@ -328,7 +328,7 @@ What v0 must do, from Advait's side. The sections above say how things work; the
 
 ### Running it
 
-**S31. Sign in once per device.** Only I can use the app or see my data. How is still open (see Technical decisions). *on device*
+**S31. Sign in once per device.** Only I can use the app or see my data. Cloudflare Access with Google sign-in, one allowed account. *on device*
 
 **S32. Errors in plain words.** If a key stops working or Yui fails to reply, I see one plain line, such as "Yui can't reply right now. The Claude key needs replacing." Never vendor JSON. Each key is checked at startup and a failure is logged clearly. Full edge-state designs stay in the backlog. *unit*
 
@@ -368,7 +368,7 @@ Decided:
 
 To decide in Claude Code:
 
-- Speech-to-text and text-to-speech providers with good Japanese, hosting, auth, and storage. Reuse the setup playbook from the date planner project (`docs/playbook.md`).
+- Details of hosting and storage are in the HLD (linked from CLAUDE.md). Decided there: Google Cloud speech-to-text and text-to-speech, a free e2-micro VM, Cloudflare Tunnel and Access for HTTPS and sign-in, SQLite with daily backups.
 - Latency budget per turn, aiming for Yui to start speaking about 1.5 seconds after he finishes.
 
 ## Success metrics
@@ -419,10 +419,8 @@ Ordered roughly by when it's likely to matter.
 ## Open questions
 
 - Native app later? Only if something specific needs it, such as the animated face or lock-screen audio.
-- Speech-to-text and text-to-speech providers: which handle a learner's accented, halting Japanese best, and which Japanese voice feels most natural?
+- Does Google speech-to-text keep his mistakes as he said them? Checked against real chats in week one; clips are kept 30 days.
 - Is 4am the right day rollover? It keeps a late-night chat with that evening's session.
 - Can Yui speak first when the app opens? Chrome allows sound in an installed app, but this needs testing on his phone and Mac early in the build. If blocked, her line shows and she speaks on his first tap.
 - Does a face earn its cost, and when do we test it?
 - Syllabus source: which N5 and N4 lists, and how sets count toward the level.
-- Keep S32 (errors in plain words)?
-- Sign-in: how he signs in on each device.
