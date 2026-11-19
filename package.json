@@ -13,7 +13,9 @@
     "start": "node dist/server/index.js",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "p0": "tsx scripts/p0.ts",
+    "syllabus": "tsx scripts/build-syllabus.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.10.0",
