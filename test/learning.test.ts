@@ -4,6 +4,7 @@ import { summaryLine } from "../src/shared/summary.js";
 import { mastery, usedWellOn } from "../src/server/learning/mastery.js";
 import { activeSeconds } from "../src/server/learning/activeTime.js";
 import { accuracy, levelScore } from "../src/server/learning/score.js";
+import { SETTINGS } from "../src/shared/settings.js";
 
 describe("S18 day rollover at 4am Tokyo time", () => {
   it("03:59 Tokyo still belongs to the previous day", () => {
@@ -64,7 +65,9 @@ describe("S27 talk time", () => {
 
 describe("S25 level score", () => {
   it("matches the spec's worked example (about 6%)", () => {
-    const r = levelScore({ masteredWords: 96, masteredGrammar: 14, accuracy: 0.71, understanding: 0.96 });
+    // The spec's example used 1,500 words / 200 grammar points; the formula must still give 6.3%.
+    const specTargets = { ...SETTINGS.score, wordsTarget: 1500, grammarTarget: 200 };
+    const r = levelScore({ masteredWords: 96, masteredGrammar: 14, accuracy: 0.71, understanding: 0.96 }, specTargets);
     expect(r.score).toBeCloseTo(0.0634, 3);
   });
   it("accuracy counts Japanese turns only", () => {

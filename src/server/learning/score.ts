@@ -16,7 +16,9 @@ export interface ScoreBreakdown {
 }
 
 /** score = (0.55 × words/1500 + 0.45 × grammar/200) × (0.7 + 0.3 × (accuracy + understanding)/2) */
-export function levelScore(i: ScoreInput, s = SETTINGS.score): ScoreBreakdown {
+export type ScoreSettings = { [K in keyof typeof SETTINGS.score]: number };
+
+export function levelScore(i: ScoreInput, s: ScoreSettings = SETTINGS.score): ScoreBreakdown {
   const clamp = (x: number) => Math.min(1, Math.max(0, x));
   const words = clamp(i.masteredWords / s.wordsTarget);
   const grammar = clamp(i.masteredGrammar / s.grammarTarget);

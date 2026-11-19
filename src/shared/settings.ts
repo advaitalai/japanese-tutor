@@ -12,8 +12,9 @@ export const SETTINGS = {
   newItemsZeroAtDue: 20, // more due than this: no new items
   minUnderstandingForNew: 0.95,
   score: {
-    wordsTarget: 1500,
-    grammarTarget: 200,
+    // Real syllabus counts through N4: 1,304 words + 84 set members, 179 grammar points.
+    wordsTarget: 1388,
+    grammarTarget: 179,
     wordsWeight: 0.55,
     grammarWeight: 0.45,
     qualityFloor: 0.7,

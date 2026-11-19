@@ -1,0 +1,388 @@
+{
+ "sets": [
+  {
+   "id": "counter-tsu",
+   "name": "Counter 〜つ (things)",
+   "members": [
+    {
+     "form": "一つ",
+     "reading": "ひとつ"
+    },
+    {
+     "form": "二つ",
+     "reading": "ふたつ"
+    },
+    {
+     "form": "三つ",
+     "reading": "みっつ"
+    },
+    {
+     "form": "四つ",
+     "reading": "よっつ"
+    },
+    {
+     "form": "五つ",
+     "reading": "いつつ"
+    },
+    {
+     "form": "六つ",
+     "reading": "むっつ"
+    },
+    {
+     "form": "七つ",
+     "reading": "ななつ"
+    },
+    {
+     "form": "八つ",
+     "reading": "やっつ"
+    },
+    {
+     "form": "九つ",
+     "reading": "ここのつ"
+    },
+    {
+     "form": "十",
+     "reading": "とお"
+    }
+   ]
+  },
+  {
+   "id": "counter-nin",
+   "name": "Counter 〜人 (people)",
+   "members": [
+    {
+     "form": "一人",
+     "reading": "ひとり"
+    },
+    {
+     "form": "二人",
+     "reading": "ふたり"
+    },
+    {
+     "form": "三人",
+     "reading": "さんにん"
+    },
+    {
+     "form": "四人",
+     "reading": "よにん"
+    },
+    {
+     "form": "五人",
+     "reading": "ごにん"
+    },
+    {
+     "form": "六人",
+     "reading": "ろくにん"
+    },
+    {
+     "form": "七人",
+     "reading": "ななにん"
+    },
+    {
+     "form": "八人",
+     "reading": "はちにん"
+    },
+    {
+     "form": "九人",
+     "reading": "きゅうにん"
+    },
+    {
+     "form": "十人",
+     "reading": "じゅうにん"
+    }
+   ]
+  },
+  {
+   "id": "counter-hon",
+   "name": "Counter 〜本 (long things)",
+   "members": [
+    {
+     "form": "一本",
+     "reading": "いっぽん"
+    },
+    {
+     "form": "二本",
+     "reading": "にほん"
+    },
+    {
+     "form": "三本",
+     "reading": "さんぼん"
+    },
+    {
+     "form": "四本",
+     "reading": "よんほん"
+    },
+    {
+     "form": "五本",
+     "reading": "ごほん"
+    },
+    {
+     "form": "六本",
+     "reading": "ろっぽん"
+    },
+    {
+     "form": "七本",
+     "reading": "ななほん"
+    },
+    {
+     "form": "八本",
+     "reading": "はっぽん"
+    },
+    {
+     "form": "九本",
+     "reading": "きゅうほん"
+    },
+    {
+     "form": "十本",
+     "reading": "じゅっぽん"
+    }
+   ]
+  },
+  {
+   "id": "counter-mai",
+   "name": "Counter 〜枚 (flat things)",
+   "members": [
+    {
+     "form": "一枚",
+     "reading": "いちまい"
+    },
+    {
+     "form": "二枚",
+     "reading": "にまい"
+    },
+    {
+     "form": "三枚",
+     "reading": "さんまい"
+    },
+    {
+     "form": "四枚",
+     "reading": "よんまい"
+    },
+    {
+     "form": "五枚",
+     "reading": "ごまい"
+    },
+    {
+     "form": "六枚",
+     "reading": "ろくまい"
+    },
+    {
+     "form": "七枚",
+     "reading": "ななまい"
+    },
+    {
+     "form": "八枚",
+     "reading": "はちまい"
+    },
+    {
+     "form": "九枚",
+     "reading": "きゅうまい"
+    },
+    {
+     "form": "十枚",
+     "reading": "じゅうまい"
+    }
+   ]
+  },
+  {
+   "id": "days-of-month",
+   "name": "Days of the month",
+   "members": [
+    {
+     "form": "一日",
+     "reading": "ついたち"
+    },
+    {
+     "form": "二日",
+     "reading": "ふつか"
+    },
+    {
+     "form": "三日",
+     "reading": "みっか"
+    },
+    {
+     "form": "四日",
+     "reading": "よっか"
+    },
+    {
+     "form": "五日",
+     "reading": "いつか"
+    },
+    {
+     "form": "六日",
+     "reading": "むいか"
+    },
+    {
+     "form": "七日",
+     "reading": "なのか"
+    },
+    {
+     "form": "八日",
+     "reading": "ようか"
+    },
+    {
+     "form": "九日",
+     "reading": "ここのか"
+    },
+    {
+     "form": "十日",
+     "reading": "とおか"
+    },
+    {
+     "form": "十四日",
+     "reading": "じゅうよっか"
+    },
+    {
+     "form": "二十日",
+     "reading": "はつか"
+    },
+    {
+     "form": "二十四日",
+     "reading": "にじゅうよっか"
+    }
+   ]
+  },
+  {
+   "id": "hours",
+   "name": "Telling time: 〜時",
+   "members": [
+    {
+     "form": "一時",
+     "reading": "いちじ"
+    },
+    {
+     "form": "二時",
+     "reading": "にじ"
+    },
+    {
+     "form": "三時",
+     "reading": "さんじ"
+    },
+    {
+     "form": "四時",
+     "reading": "よじ"
+    },
+    {
+     "form": "五時",
+     "reading": "ごじ"
+    },
+    {
+     "form": "六時",
+     "reading": "ろくじ"
+    },
+    {
+     "form": "七時",
+     "reading": "しちじ"
+    },
+    {
+     "form": "八時",
+     "reading": "はちじ"
+    },
+    {
+     "form": "九時",
+     "reading": "くじ"
+    },
+    {
+     "form": "十時",
+     "reading": "じゅうじ"
+    },
+    {
+     "form": "十一時",
+     "reading": "じゅういちじ"
+    },
+    {
+     "form": "十二時",
+     "reading": "じゅうにじ"
+    }
+   ]
+  },
+  {
+   "id": "minutes",
+   "name": "Telling time: 〜分",
+   "members": [
+    {
+     "form": "一分",
+     "reading": "いっぷん"
+    },
+    {
+     "form": "二分",
+     "reading": "にふん"
+    },
+    {
+     "form": "三分",
+     "reading": "さんぷん"
+    },
+    {
+     "form": "四分",
+     "reading": "よんぷん"
+    },
+    {
+     "form": "五分",
+     "reading": "ごふん"
+    },
+    {
+     "form": "六分",
+     "reading": "ろっぷん"
+    },
+    {
+     "form": "七分",
+     "reading": "ななふん"
+    },
+    {
+     "form": "八分",
+     "reading": "はっぷん"
+    },
+    {
+     "form": "九分",
+     "reading": "きゅうふん"
+    },
+    {
+     "form": "十分",
+     "reading": "じゅっぷん"
+    }
+   ]
+  },
+  {
+   "id": "prices",
+   "name": "Prices: hundreds and thousands",
+   "members": [
+    {
+     "form": "百円",
+     "reading": "ひゃくえん"
+    },
+    {
+     "form": "二百円",
+     "reading": "にひゃくえん"
+    },
+    {
+     "form": "三百円",
+     "reading": "さんびゃくえん"
+    },
+    {
+     "form": "六百円",
+     "reading": "ろっぴゃくえん"
+    },
+    {
+     "form": "八百円",
+     "reading": "はっぴゃくえん"
+    },
+    {
+     "form": "千円",
+     "reading": "せんえん"
+    },
+    {
+     "form": "三千円",
+     "reading": "さんぜんえん"
+    },
+    {
+     "form": "八千円",
+     "reading": "はっせんえん"
+    },
+    {
+     "form": "一万円",
+     "reading": "いちまんえん"
+    }
+   ]
+  }
+ ]
+}

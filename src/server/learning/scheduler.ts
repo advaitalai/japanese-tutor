@@ -1,10 +1,11 @@
 import { SETTINGS } from "../../shared/settings.js";
 import { addDays, daysBetween } from "../../shared/day.js";
-import type { Level } from "../../shared/types.js";
+import type { ItemKind, Level } from "../../shared/types.js";
 import type { MasteryResult } from "./mastery.js";
 
 export interface SyllabusItem {
   id: string;
+  kind?: ItemKind;
   level: Level;
   order: number; // position in the syllabus
   prereqs: string[];
@@ -97,7 +98,14 @@ export function schedule(input: ScheduleInput, s = SETTINGS): Target[] {
       return item.prereqs.every((id) => progress.get(id)?.known || byId.get(id) === undefined);
     })
     .sort((a, b) => a.order - b.order);
-  for (const item of fresh.slice(0, newCount)) {
+  // Rotate kinds so a day mixes grammar, words and sets instead of draining one list.
+  const kinds: ItemKind[] = ["grammar", "word", "set"];
+  const start = Math.floor(Date.parse(today) / 86_400_000) % kinds.length;
+  const queues = kinds.map((_, k) => fresh.filter((i) => (i.kind ?? "word") === kinds[(start + k) % kinds.length]));
+  for (let round = 0; targets.filter((t) => t.slot === "new").length < newCount && queues.some((q) => q.length); round++) {
+    const q = queues[round % queues.length]!;
+    const item = q.shift();
+    if (!item) continue;
     picked.add(item.id);
     targets.push({ slot: "new", itemId: item.id, why: "Next on the list" });
   }

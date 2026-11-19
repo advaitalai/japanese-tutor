@@ -73,3 +73,5 @@ Why v0 looks the way it does. Each line is a decision Advait made while testing 
 - **Google for speech both ways, no bake-off.** One vendor, no extra keys (the VM's service account). Judge it from real chats in week one using the kept clips; switch if it hides his mistakes.
 - **Google Cloud setup runs as one script in Cloud Shell.** Advait creates the billing account (Japan) himself; everything else is scripted. Claude never holds owner credentials; after setup it only needs the read-only log key.
 - **Keep S32, errors in plain words.** The date planner showed raw JSON for 1.5 days when a key expired.
+- **Syllabus from OpenJLPT, sets are our own.** OpenJLPT cleans Waller's N5 and N4 lists against JMdict and adds 179 grammar points with formation rules (CC BY-SA 4.0, credited in syllabus/source/NOTICE.md). Counters, dates, times and prices are a hand-written sets file. Set members count as words in the level score.
+- **New items rotate between grammar, words and sets.** Otherwise the 2 new items a day would drain one list (alphabetical words) before touching the others.

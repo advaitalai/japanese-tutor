@@ -221,11 +221,11 @@ The ideas behind the rule have strong research behind them: practice spread over
 The score combines coverage and quality:
 
 ```
-score = (0.55 × mastered_words / 1500 + 0.45 × mastered_grammar / 200)
+score = (0.55 × mastered_words / 1388 + 0.45 × mastered_grammar / 179)
         × (0.7 + 0.3 × (accuracy + understanding) / 2)
 ```
 
-- 1,500 words and 200 grammar points are rough cumulative targets through N4. They become the real counts once the syllabus list is chosen. How sets count is decided with the syllabus.
+- The targets are the real syllabus counts through N4: 1,388 words (1,304 words plus 84 set members, counted as words) and 179 grammar points. The syllabus comes from OpenJLPT (built on Waller's lists, CC BY-SA 4.0); sets are our own. See syllabus/source/NOTICE.md.
 - Accuracy: his Japanese replies with no fix, divided by all his Japanese replies, averaged over the last 5 sessions. Counted in code.
 - Understanding: share of Yui's chat words he knew, averaged over the last 5 sessions.
 
@@ -423,4 +423,3 @@ Ordered roughly by when it's likely to matter.
 - Is 4am the right day rollover? It keeps a late-night chat with that evening's session.
 - Can Yui speak first when the app opens? Chrome allows sound in an installed app, but this needs testing on his phone and Mac early in the build. If blocked, her line shows and she speaks on his first tap.
 - Does a face earn its cost, and when do we test it?
-- Syllabus source: which N5 and N4 lists, and how sets count toward the level.
